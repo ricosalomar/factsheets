@@ -50,6 +50,7 @@ class CustomPlantListView(TemplateView):
     get_query_cache is the method that attempts to retrieve the sql result from the cache, or store a new one.
     The get_context_data method is pretty complex, because it builds the layered navigation on the left side.
 
+
     """
 
     def dispatch(self, request, *args,**kwargs):
