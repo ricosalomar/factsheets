@@ -57,6 +57,9 @@ class Plant(models.Model):
 
     updated = models.BooleanField(default=False)
     drought_tolerant = models.BooleanField(default=False)
+    attracts_songbirds = models.BooleanField(default=False)
+    attracts_hummingbirds = models.BooleanField(default=False)
+    attracts_butterflies = models.BooleanField(default=False)
 
     search_flower_color = models.ManyToManyField(Color, related_name='plant_flower_color', blank=True)
     search_leaf_color = models.ManyToManyField(Color, related_name='plant_leaf_color', blank=True)
