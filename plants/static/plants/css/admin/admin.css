@@ -1,0 +1,30 @@
+#content {max-width: 1107px; margin: 0 auto; font-size: 14px;}
+.field-scientific_name, .field-category{ width:36%; float: left; }
+.field-category {width: 50%}
+#chosen_category { width:15%; float: left; height: 140px; font-weight: bold; font-size: 12px;}
+#chosen_cat_span { font-weight: normal; }
+#id_category { height: 100px; }
+
+.field-search_flower_color ul li, .field-search_leaf_color ul li, .field-search_light ul li, .field-search_season ul li { list-style-type: none;padding: 1px 0 0 3px;display: inline-block;margin: 1px;white-space: nowrap;width: 96px;border: 1px solid #cecece; }
+.field-category ul li { list-style-type: none;padding: 1px 0 0 3px;display: inline-block;margin: 1px;white-space: nowrap;width: 130px;border: 1px solid #cecece; }
+.field-search_light, .field-search_season {width: 98%; }
+
+.form-row { float:left; }
+.field-drought_tolerant, .field-update_time, .field-tags { width:98%; float: none; }
+tr.form-row { width:100%; float:none;}
+
+.half-width { width:48%; float: left; margin: 6px; }
+.half-width h2 { display: none; }
+#commonname_set-group {  }
+
+.dynamic-Plant_category td p, #commonname_set-group td p, #cultivar_set-group td p { display: none; }
+#Plant_category-group .tabular tr.has_original td, #commonname_set-group .tabular tr.has_original td, #cultivar_set-group .tabular tr.has_original td { padding-top: 7px; }
+#Plant_category-group .add-another { display: none; }
+
+.field-season, .field-light, .field-color, .field-space, .field-flowering_period, .field-flower_color,
+.field-depth, .field-usage, .field-organ, .field-hardiness, .field-storage, .field-foliage, .field-flower,
+.field-zones, .field-habit, .field-fronds, .field-site, .field-size, .field-texture, .field-form, .field-propagation,
+.field-exposure, .field-fruit, .field-soil, .field-inflorescence, .field-regions, .field-family, .field-description,
+.field-origin, .field-distribution, .field-found, .field-mode, .field-poison_part, .field-symptoms, .field-edibility,
+.field-toxic_principle, .field-severity, .field-sub_type, .field-fragrance, .module >.field-width, .module >.field-height,.field-growth_rate,
+.field-leaf, .field-climbing_method, .field-life_cycle { display: none; }  /*.form-row.field-category*/

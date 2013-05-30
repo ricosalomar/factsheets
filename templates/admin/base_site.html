@@ -1,0 +1,12 @@
+{# Located in PROJECT_PATH/templates/admin/base_site.html #}
+
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans 'Consumer Horticulture Plant Factsheets' %}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">{% trans 'Consumer Horticulture Plant Factsheets' %}</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

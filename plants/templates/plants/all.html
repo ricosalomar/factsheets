@@ -1,0 +1,30 @@
+{% extends "plants/base.html" %}
+{% block title %}{{  plant.scientific_name }}{% endblock %}
+
+{% block content %}
+<ul>
+{#{% for key, value in categories.items %}#}
+{#    <li><a href="/plants/{{ value }}">{{ key }}</a></li>#}
+{#{%  endfor %}#}
+
+<li><a href="/plants/annual/">Annuals</a></li>
+<li><a href="/plants/carnivorous/">Carnivorous Plants</a></li>
+<li><a href="/plants/fern/">Ferns</a></li>
+<li><a href="/plants/groundcover/">Groundcover</a></li>
+<li><a href="/plants/herb/">Herbs</a></li>
+<li><a href="/plants/native/">Native Plants</a></li>
+<li><a href="/plants/ornamentalgrass/">Ornamental Grasses</a></li>
+<li><a href="/plants/bulbperennial/">Perennial Bulbs</a></li>
+<li><a href="/plants/perennial/">Perennials</a></li>
+<li><a href="/plants/poison/">Poisonous Plants</a></li>
+<li><a href="/plants/rose/">Roses</a></li>
+<li><a href="/plants/shrub/">Shrubs</a></li>
+<li><a href="/plants/bulbspring/">Spring Bulbs</a></li>
+<li><a href="/plants/bulbsummer/">Summer Bulbs</a></li>
+<li><a href="/plants/tree/">Trees</a></li>
+<li><a href="/plants/vine/">Vines</a></li>
+<li><a href="/plants/watergarden/">Water Gardens</a></li>
+<li><a href="/plants/wildflower/">Wildflowers</a></li>
+
+</ul>
+{% endblock %}

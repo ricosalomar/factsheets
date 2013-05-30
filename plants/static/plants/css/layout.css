@@ -1,0 +1,291 @@
+/*
+* Skeleton V1.2
+* Copyright 2011, Dave Gamache
+* www.getskeleton.com
+* Free to use under the MIT license.
+* http://www.opensource.org/licenses/mit-license.php
+* 6/20/2012
+*/
+
+/* Table of Content
+==================================================
+	#Site Styles
+	#Page Styles
+	#Media Queries
+	#Font-Face */
+
+/* #Site Styles
+================================================== */
+.plant_detail { border: 1px solid #cecece; border-radius: 4px; overflow: hidden; padding: 10px; box-shadow: inset 0 0 90px 0 rgba(120, 146, 100, 0.24); margin-bottom: 25px; min-height: 600px;
+    /*background: #ffffff; */
+    /*background: -moz-linear-gradient(top,  #ffffff 0%, #e5e5e5 100%); */
+    /*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e5e5e5)); */
+    /*background: -webkit-linear-gradient(top,  #ffffff 0%,#e5e5e5 100%); */
+    /*background: -o-linear-gradient(top,  #ffffff 0%,#e5e5e5 100%); */
+    /*background: -ms-linear-gradient(top,  #ffffff 0%,#e5e5e5 100%); */
+    /*background: linear-gradient(to bottom,  #ffffff 0%,#e5e5e5 100%); */
+    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 ); */
+
+    background: #fefefd; /* Old browsers */
+    background: -moz-linear-gradient(top,  #fefefd 0%, #dce3c4 42%, #aebf76 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fefefd), color-stop(42%,#dce3c4), color-stop(100%,#aebf76)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #fefefd 0%,#dce3c4 42%,#aebf76 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #fefefd 0%,#dce3c4 42%,#aebf76 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #fefefd 0%,#dce3c4 42%,#aebf76 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #fefefd 0%,#dce3c4 42%,#aebf76 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fefefd', endColorstr='#aebf76',GradientType=0 ); /* IE6-9 */
+    background: url('images/fl_grn_bkg.png')
+
+ }
+.plant_detail dl dt {font-weight: bold;}
+.plant_detail dl dd {margin: 0 0 0 5px;}
+
+#left_col { float: left; width: 55%; margin-bottom: 10px;}
+
+#right_col { float: right; width: 44%; margin: 0 0 0 1%; }
+
+.img_container {
+    text-align: center;
+    padding: 4px;
+    border-radius: 4px;
+    background: url('images/paper_bg_02.jpg') top #fff;
+    box-shadow: 1px 1px 7px rgba(0, 0, 0, 0.5);
+    margin-bottom: 10px;
+}
+
+h1 {
+    margin: -10px -10px 20px -10px;
+    background: url('images/fl_dk_bkg.jpg') #000 top;
+    color: #fff;
+    padding: 5px 5px 0px 7px;
+    border-radius: 8px 8px 0 0;
+    text-shadow: 0 0 10px #000;
+}
+
+.plant_details {
+    background: url('images/paper_bg_02.jpg') top #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 1px 1px 7px rgba(0, 0, 0, 0.5);
+    line-height: 18px;
+}
+
+.detail_bottom { background: url('images/bg_tear.png') top transparent;}
+
+.plant_image { width: 100%; border-radius: 4px; }
+.caption { font-size: 80%; }
+
+.breadcrumb_container { border-bottom: 1px solid #cecece; margin:-10px -10px 10px -10px; padding: 10px; color: #335010; }
+.breadcrumb_container a, .breadcrumb_container a:visited { color: #335010; }
+
+#search_div { margin: 10px 0 0 0; text-align: right; }
+#search_div form input { vertical-align: middle; display: inline; max-width: 120px; }
+#search_input { margin-top:2px; }
+.search_error { display:none; margin-bottom: 2px; color: red; }
+.search_form { margin-bottom: 0; }
+.plant_list, #plant-table-div { overflow:auto; background: url('images/paper_bg_02.jpg') top #fff; border-radius: 8px; box-shadow: 1px 1px 7px rgba(0, 0, 0, 0.5); }
+.categories { background: none; box-shadow: 0 0 10px rgba(0, 0, 0, 0.14); width: 50%; float: left; margin-right: 20px; }
+.img_container.cat_page { width: 45%; float: left; }
+
+#plant-table-div { padding: 5px; width: 728px; margin: 0; }
+
+.plant_list ul li ul { display: none; }
+.plant_list ul li  { cursor:pointer; }
+
+#plant_grid { overflow: auto; }
+.plant_grid_item { float: left; width: 30.5%; border-radius: 5px; box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5); margin: 5px; padding:5px 5px 10px 5px; overflow: auto; }
+.plant_grid_item h3 { font-size: 18px; line-height: normal; color: #fff; background: url('images/fl_dk_bkg.jpg') #000 top; margin: -5px -5px 5px -5px; border-radius: 5px 5px 0 0; padding: 3px; }
+.plant_grid_item h3 a { color: #fff; text-decoration: none; display: block; }
+.plant_grid_item img { float: right; margin: 0 0 0 5px; }
+.plant_grid_row { overflow: auto; }
+
+table.plant_list_table {
+    font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+    font-size: 12px;
+    background: #fff;
+    border-collapse: collapse;
+    text-align: left;
+    margin: 20;
+    width: 100%;
+}
+
+.plant_list_table th,  .plant_list_table th a{
+    font-size: 14px;
+    font-weight: normal;
+    color: rgb(1, 24, 1);
+    border-bottom: 2px solid rgb(1, 24, 1);
+    padding: 10px 8px;
+    text-decoration: none;
+}
+
+.plant_list_table th a:hover { text-decoration: underline; }
+
+.plant_list_table th.sorted { text-decoration: underline; }
+
+.plant_list_table td {
+    border-bottom: 1px solid #ccc;
+    color: rgb(1, 24, 1);
+    padding: 6px 8px;
+    vertical-align: middle;
+}
+
+td.row-gray { background: rgb(247, 247, 247) }
+
+.plant_list_table td a, .plant_list_table td a:visited { color:rgb(1, 24, 1); }
+
+#left_nav { box-shadow: 0 0 1px #000; padding: 5px 5px 0 5px; margin: 0 10px 10px 0; position: relative; }
+#left_nav h3 { line-height: normal; background: rgba(51, 80, 0, 0.15); margin: -5px -5px 0 -5px; padding: 3px; font: inherit; }
+.nav_toggle { position: absolute; top: 2px; right: 5px;  display: none; }
+
+#left_nav ul { margin: 3px 0 12px 0;}
+#left_nav ul li { font-size: 14px; font-weight: bold; margin-bottom: 2px; line-height: normal; }
+#left_nav ul ul li { font-size: 12px; font-weight: normal;}
+#left_nav ul ul li a { background: url(images/un_checked.png) no-repeat scroll 0 2px; padding-left:12px; text-decoration: none; display: block; }
+#left_nav ul ul li a.selected { background: url(images/checked.png) no-repeat scroll 0 2px; padding-left:12px;}
+#left_nav label { font-weight: normal; }
+
+
+ul.cat_list {margin: 0 auto; width: 50%; float:left; min-width: 215px; }
+
+ul.cat_list li {  }
+
+ul.cat_list li a, ul.cat_list li a:visited { text-decoration: none; font-weight: bold; font-size: 17px; display: block;  border-radius: 3px; padding:5px; }
+
+
+ul.cat_list li a:hover { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.14); text-decoration: underline; }
+
+.pagination { text-align: center; margin: 5px 0 0;}
+
+.pagination a.selected {text-decoration: none; padding:3px; background-color: rgb(1, 24, 1); color: #fff; border-radius: 8px;}
+
+.next, .previous { border: 1px solid rgb(1, 24, 1); border-radius: 3px; padding: 0 4px; margin: 0 10px; font-size: 85%; white-space: nowrap; }
+.next a, .next a:visited, .previous a, .previous a:visited { text-decoration: none; }
+
+.key-poison-part, .key-poison-delivery-mode, .key-symptoms, .key-toxic-principle, .key-severity, .key-edibility, .poison-warning { color: rgb(179, 0, 0); }
+.poison-warning { margin-bottom: 8px; display: none;}
+
+.search_sort_container { float:right; height:22px; overflow: hidden; width: 277px; text-align: right; }
+.search_sort_container label { float: left; margin-right: 10px; font-weight: normal; color:#335010; }
+
+#hide_nav {display: none; }
+
+.spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -60px; /* half width of the spinner gif */
+    margin-top: -60px; /* half height of the spinner gif */
+    text-align:center;
+    z-index:1234;
+    overflow: auto;
+    width: 120px; /* width of the spinner gif */
+    height: 108px; /* height of the spinner gif +2px to fix IE8 issue */
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.87);
+    box-shadow: 0 0 4px #000;
+    padding: 10px;
+}
+
+
+
+
+/* #Page Styles
+================================================== */
+
+/* #Media Queries
+================================================== */
+
+	/* Smaller than standard 960 (devices and browsers) */
+	@media only screen and (max-width: 959px) {
+        .nav_toggle { display: none; }
+    }
+
+	/* Tablet Portrait size to standard 960 (devices and browsers) */
+	@media only screen and (min-width: 768px) and (max-width: 959px) {
+        #left_col, #right_col { width: 47.5%; }
+        #plant-table-div { width: 570px; }
+        .plant_grid_item { width: 46.4% }
+        .nav_toggle { display: none; }
+
+        ul.cat_list { width: 50%; min-width: 0;}
+    }
+
+	/* All Mobile Sizes (devices and browser) */
+	@media only screen and (max-width: 767px) {
+        #left_col, #right_col{ width: 47.5%; }
+        .plant_grid_item { width: 96%; }
+        .plant_grid_row { overflow: visible; }
+        .show { display: block; }
+        .nav_ul {display: none; }
+
+        .img_container.cat_page, .categories { width: 100%; margin: 0; float: none; }
+        .img_container.cat_page {margin-top: 20px; width: 98%; }
+
+        ul.cat_list { width: 33%; min-width: 0;}
+    }
+
+	/* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
+	@media only screen and (min-width: 480px) and (max-width: 767px) {
+        #plant-table-div, #left_nav { width: 388px; }
+        .plant_grid_item { width: 96%; }
+        .plant_grid_row { overflow: visible; }
+        #left_col, #right_col { width: 100%; }
+        h1 {font-size: 40px; line-height: 44px;}
+        .categories ul li { margin-bottom: 2px; }
+        .categories ul li a { font-size: 14px; line-height: normal;}
+        #left_nav ul li { display: inline-block; }
+        .th-cat, .td-cat { display: none; }
+        .pagination { font-size: 130% }
+        .pagination a { margin: 0 3px; }
+        .next,.previous { display: block; width: 100px; margin: 0 auto; margin-top: 10px; margin-bottom: 10px; }
+        .show { display: block; }
+        .nav_ul {display: none; }
+
+        .img_container.cat_page, .categories { width: 100%; margin: 0; float: none; }
+        .img_container.cat_page {margin-top: 20px; width: 98%; }
+
+        ul.cat_list { width: 33%; min-width: 0;}
+    }
+
+	/* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
+	@media only screen and (max-width: 479px) {
+        #plant-table-div, #left_nav { width: 268px; }
+        .plant_image { width: 100%; }
+        .plant_grid_item { width: 93%; }
+        .plant_grid_row { overflow: visible; }
+        #left_col, #right_col { width: 100%; }
+        h1 {font-size: 36px; line-height: 40px;}
+        .categories ul li { margin-bottom: 2px; }
+        .categories ul li a { font-size: 14px; line-height: normal;}
+        #left_nav ul li { display: inline-block; }
+        .th-cat, .td-cat, .th-img, .td-img { display: none; }
+        .pagination { font-size: 130% }
+        .pagination a { margin: 0 3px; }
+        .next,.previous { display: block; width: 100px; margin: 0 auto; margin-top: 10px; margin-bottom: 10px; }
+        .show { display: block; }
+        .nav_ul {display: none; }
+
+        .img_container.cat_page, .categories { width: 100%; margin: 0; float: none; }
+        .img_container.cat_page {margin-top: 20px; width: 98%; }
+
+        ul.cat_list { width: 50%; min-width: 0;}
+    }
+
+
+/* #Font-Face
+================================================== */
+/* 	This is the proper syntax for an @font-face file
+		Just create a "fonts" folder at the root,
+		copy your FontName into code below and remove
+		comment brackets */
+
+/*	@font-face {
+	    font-family: 'FontName';
+	    src: url('../fonts/FontName.eot');
+	    src: url('../fonts/FontName.eot?iefix') format('eot'),
+	         url('../fonts/FontName.woff') format('woff'),
+	         url('../fonts/FontName.ttf') format('truetype'),
+	         url('../fonts/FontName.svg#webfontZam02nTh') format('svg');
+	    font-weight: normal;
+	    font-style: normal; }
+*/

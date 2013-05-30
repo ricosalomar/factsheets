@@ -1,0 +1,123 @@
+from django.contrib import admin
+from plants.models import Plant, Category,CommonName, Cultivar, PlantImage, OldUrl
+from django.forms import CheckboxSelectMultiple
+
+
+# class CategoryInline(admin.TabularInline):
+#     model = Plant.category.through
+#     extra = 0
+class CategoryAdmin(admin.ModelAdmin):
+    fields = ['category']
+
+class FlowerColorAdmin(admin.ModelAdmin):
+    fields = ['search_flower_color']
+
+class LeafColorAdmin(admin.ModelAdmin):
+    fields = ['search_leaf_color']
+
+class LightAdmin(admin.ModelAdmin):
+    fields = ['search_light']
+
+class CommonNameInline(admin.TabularInline):
+    model = CommonName
+    extra = 0
+
+class CultivarInline(admin.TabularInline):
+    model = Cultivar
+    extra = 0
+
+class PlantImageInline(admin.TabularInline):
+    model = PlantImage
+    extra = 0
+
+class OldUrlInline(admin.TabularInline):
+    model = OldUrl
+    extra = 0
+
+class PlantAdmin(admin.ModelAdmin):
+    fields = ['scientific_name',
+                'category',
+                'comment',
+                'description',
+                'search_flower_color',
+                'search_leaf_color',
+                'search_light',
+                'search_season',
+                'drought_tolerant',
+                'update_time',
+                'tags',
+                'season',
+                'light',
+                'color',
+                'height',
+                'width',
+                'space',
+                'flowering_period',
+                'flower_color',
+                'depth',
+                'usage',
+                'organ',
+                'hardiness',
+                'storage',
+                'foliage',
+                'flower',
+                'zones',
+                'habit',
+                'fronds',
+                'site',
+                # 'rate',
+                'size',
+                'texture',
+                'form',
+                'propagation',
+                'exposure',
+                'fruit',
+                'soil',
+                'inflorescence',
+                'regions',
+                'family',
+                'origin',
+                'distribution',
+                'found',
+                'mode',
+                'poison_part',
+                'symptoms',
+                'edibility',
+                'toxic_principle',
+                'severity',
+                'sub_type',
+                'fragrance',
+                'growth_rate',
+                'leaf',
+                'climbing_method',
+                'life_cycle',
+                'internal_comment', ]
+    ordering = ('scientific_name',)
+    readonly_fields = ['update_time', 'update_by', OldUrlInline]
+    inlines = [ CommonNameInline, CultivarInline, PlantImageInline, OldUrlInline,]
+    list_display = ('scientific_name','common_names', 'categories','update_time')
+    list_filter = ['category','updated','update_time']
+
+    def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        if db_field.name == 'search_flower_color' or db_field.name == 'search_leaf_color' or db_field.name == 'category' or db_field.name == 'search_light' or db_field.name == 'search_season':
+            kwargs['widget'] = CheckboxSelectMultiple()
+            kwargs['help_text'] = ''
+
+        return db_field.formfield(**kwargs)
+
+    class Media:
+        js = (
+            '/static/plants/js/tiny_mce/tiny_mce.js',
+            '/static/plants/js/tiny_mce/textareas.js',
+        )
+
+        css = {
+            'all': ('/static/plants/css/admin/admin.css',)
+        }
+
+# class CategoryAdmin(admin.ModelAdmin):
+#     fields = ['category']
+
+
+admin.site.register(Plant, PlantAdmin)
+# admin.site.register(Category, CategoryAdmin)

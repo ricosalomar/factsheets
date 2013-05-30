@@ -1,0 +1,53 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="{%  static "plants/css/base.css" %}" />
+    <link rel="stylesheet" href="{%  static "plants/css/layout.css" %}" />
+    <link rel="stylesheet" href="{%  static "plants/css/skeleton.css" %}" />
+    {% block canonical %}{% endblock %}
+    <title>{% block title %}Consumer FactSheets{% endblock %}</title>
+<link href="http://www.ncsu.edu/favicon.ico" rel="Shortcut Icon" type="image/x-icon">
+</head>
+
+<body>
+    <div class="container">
+
+    <div id="spinner" class="spinner" style="display:none;">
+        <img id="img-spinner" src="/static/plants/css/images/ajax-loader.gif" alt="Loading"/>
+    </div>
+
+        <div class="sixteen columns">
+
+            <div id="ncce-logo-header" class="eleven columns">
+                <div id="ncce-ncsu-brick">
+                    <img alt="NC State University Brick Logo" src="http://www.ces.ncsu.edu/images/ncsu_red_brick.png" height="22" width="142">
+                </div>
+                <img alt="NCCE Logo" src="http://www.ces.ncsu.edu/images/logos/nc-cooperative-extension-logo.png">
+            </div>
+
+            <div id="search_div" class="five columns">
+                <form class="search_form" action="/plants/search/" method="get" >
+{#                    {% if error %}#}
+{#                        <p style="color: red;">Please submit a search term.</p>#}
+{#                    {% endif %}#}
+                    <div class="search_error" {% if error %}style="display: block;"{% endif %}>Please submit a search term.</div>
+                    <input type="submit" id="search_submit" class="search" value="Search" />
+                    <input type="text" name="q" id="search_input" value="{{ context.search.term|default_if_none:"" }}" />
+                </form>
+            </div>
+
+        </div>
+
+        <div id="content" class="sixteen columns">
+            <div class="plant_detail">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+
+    </div>
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="{%  static "plants/js/main.js" %}"></script>
+</html>

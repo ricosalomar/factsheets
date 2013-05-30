@@ -1,0 +1,42 @@
+{% extends "plants/base.html" %}
+{% load plant_extras %}
+
+{% block title %}{{  plant.scientific_name }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ plant.get_absolute_url }}"/>{% endblock %}
+
+{% block content %}
+    <div class="breadcrumb_container"><a href="/plants/plant-list">Plants</a>{% if category %} > <a href="/plants/category/{{ category.slug }}/">{{ category.category }}</a>{% endif %} > {{  plant.scientific_name }}</div>
+
+
+<div id="left_col">
+
+<div class="plant_details">
+<h1>{{  plant.scientific_name }}</h1>
+<div class="poison-warning">This plant has poison characteristics. See below.</div>
+    <dl>
+    {% for name, value in plant.get_fields %}
+      {% if value %}
+        <dt class="key key-{{ name|slugify }}">{{ name }}:</dt><dd class="value value-{{ name|slugify }}">{{ value|safe }}</dd>
+      {% endif %}
+    {% endfor %}
+    </dl>
+
+<p class='qr_code'>
+    <img src="{{plant_url|qr:"120x130"}}" />
+</p>
+
+</div>
+{#<div class="detail_bottom"></div>#}
+</div>
+
+<div id="right_col">
+        <!--<dt>Images</dt>-->
+
+        {% for i in plant.plantimage_set.all %}
+        <div class="img_container"><img class="plant_image" src="{{  i.img_url }}" alt="{{ i.alt_text }}" /><span class="caption">{{ i.alt_text }}</span></div>
+        {% endfor %}
+
+</div>
+
+
+{% endblock %}

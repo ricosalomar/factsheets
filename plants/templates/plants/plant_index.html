@@ -1,0 +1,102 @@
+{% extends "plants/base.html" %}
+{% load plant_extras %}
+
+{% block title %}{{  plant.scientific_name }}{% endblock %}
+
+{% block content %}
+    <div class="breadcrumb_container">
+    <div class="search_sort_container">
+        <label for="search_sort">Sort by:</label>
+        <select id="search_sort" name="search_sort">
+            <option value="scientific_name">Scientific Name</option>
+            <option value="common_name">Common Name</option>
+        </select>
+    </div>
+    {% if search %}
+        <a href="/plants/plant-list">Plants</a> > Search > <strong>{{ search_query }}</strong>
+    {% else %}
+        <a href="/plants/plant-list">Plants</a> > <a href="/plants/category/{{ category.slug }}">{{ category.category }}</a>
+    {% endif %}
+
+        {% for q, i in query_dict.items %}
+            {% if q != 's'  and q != 'q'%}
+                > {{ q|deslug }} = {{ i|deslug }}
+            {% endif %}
+        {% endfor %}
+
+        {{ plant_count_results }}
+
+    </div>
+
+<div class="">
+{% include 'plants/left_nav.html' %}
+    <div class="columns" id="plant-table-div">
+    {% if plant_list %}
+
+        {% if plant_count > 24 %}
+
+            <table class="plant_list_table">
+            <tr>
+                <th class="th-sci-name{% if query_dict.s != 'common_name' %} sorted{% endif %}">Scientific Name</th>
+                <th class="th-comm-name{% if query_dict.s == 'common_name' %} sorted{% endif %}">Common Name(s)</th>
+                <th class="th-cat">Plant Category</th>
+                <th class="th-img">Image</th>
+            </tr>
+            {% for plant in plant_list %}
+                <tr>
+                    <td class="th-sci-name {% cycle '' 'row-gray' as rowcolors %}"><a href="/plants/{{ category_slug|default_if_none:"all" }}/{{ plant.slug }}">{{ plant.scientific_name }}</a></td>
+                    <td class="td-comm-name {{ rowcolors }}">{{ plant.common_names|default_if_none:""|safe }}</td>
+                    <td class="td-cat {{ rowcolors }}">{{ plant.category_links|safe }}</td>
+                    <td class="td-img {{ rowcolors }}"><a href="/plants/{{ category_slug|default_if_none:"all" }}/{{ plant.slug }}"><img src="{{ plant.img|default_if_none:"/static/plants/css/images/plant_img_not_found.png"|safe }}" height="40" /></a></td>
+                </tr>
+            {% endfor %}
+            </table>
+
+        {% else %}
+
+        <div id="plant_grid">
+        {% for plant in plant_list %}
+            {% if forloop.counter0|divisibleby:3 %}
+            <div class="plant_grid_row">
+            {% endif %}
+            <div class="plant_grid_item">
+                <h3 class=""><a href="/plants/{{ category_slug|default_if_none:"all" }}/{{ plant.slug }}">{{ plant.scientific_name }}</a></h3>
+                <a href="/plants/{{ category_slug|default_if_none:"all" }}/{{ plant.slug }}"><img src="{{ plant.img|default_if_none:"/static/plants/css/images/plant_img_not_found.png"|safe }}" width="72" style="float:right" /></a>
+                <dl>
+                    <dt>Common Name(s)</dt>
+                    <dd>{{ plant.common_names|default_if_none:""|safe }}</dd>
+                    <dt>Category</dt>
+                    <dd>{{ plant.category_links|safe }}</dd>
+                </dl>
+            </div>
+            {% if forloop.counter|divisibleby:3 %}
+            </div>
+            {% endif %}
+        {% endfor %}
+
+        {% endif %}
+
+    {% else %}
+        <p>No plants are available.</p>
+    {% endif %}
+
+    {% if plant_list.has_other_pages %}
+
+        <div class="pagination">
+        {% if plant_list.has_previous %}
+            <span class="previous"><a href="{{ link_address }}{{plant_list.previous_page_number }}/?{{ query_params }}"><< previous</a></span>
+        {% endif %}
+        {% for page in plant_list.paginator.page_range %}
+            <a {% if page == plant_list.number %} class="selected" {% endif %} href="{{ link_address }}{{ page }}/?{{ query_params }}">{{ page }}</a>
+        {% endfor %}
+
+        {% if plant_list.has_next %}
+            <span class="next"><a href="{{ link_address }}{{plant_list.next_page_number }}/?{{ query_params }}">next >></a></span>
+        {% endif %}
+        </div>
+
+    {% endif %}
+    </div>
+</div>
+
+{% endblock %}

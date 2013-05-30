@@ -1,0 +1,27 @@
+{% extends "plants/base.html" %}
+
+{% block title %}{{  plant.scientific_name }}{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb_container"><a href="/plants/plant-list">Plants</a></div>
+
+{% if plant_list %}
+    {% regroup plant_list by category.category as category_list %}
+    {{ category_list }}
+    <ul>
+    {% for cat in category_list %}
+        <li>{{ cat.grouper }}
+            <ul>
+                {% for plant in plant_list.list %}
+                    <li><a href="/plants/{{ plant.slug }}/">{{ plant.scientific_name }}</a> | {{ plant.common_names }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No plants are available.</p>
+{% endif %}
+
+{% endblock %}

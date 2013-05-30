@@ -1,0 +1,53 @@
+    <div class="three columns" id ="left_nav">
+    <h3>Navigate</h3>
+    <span class="nav_toggle hide">hide</span>
+    <span class="nav_toggle show">show</span>
+    <ul class="nav_ul">
+    {% if plant_nav.category %}
+        <li>Categories</li>
+            <ul>
+        {% for c in plant_nav.category %}
+            <li>{{ c|safe }}</li>
+        {% endfor %}
+            </ul>
+    {% endif %}
+
+    {% if plant_nav.seasons %}
+        <li>Seasons</li>
+            <ul>
+        {% for s in plant_nav.seasons %}
+            <li>{{ s|safe }}</li>
+        {% endfor %}
+            </ul>
+    {% endif %}
+
+    {% if plant_nav.light %}
+        <li>Light</li>
+            <ul>
+        {% for s in plant_nav.light %}
+            <li>{{ s|safe }}</li>
+        {% endfor %}
+            </ul>
+    {% endif %}
+
+    {% if plant_nav.flower_color %}
+        <li>Flower Color</li>
+            <ul>
+        {% for s in plant_nav.flower_color %}
+            <li>{{ s|safe }}</li>
+        {% endfor %}
+            </ul>
+    {% endif %}
+
+    {% if plant_nav.leaf_color %}
+        <li>Leaf Color</li>
+            <ul>
+        {% for s in plant_nav.leaf_color %}
+            <li>{{ s|safe }}</li>
+        {% endfor %}
+            </ul>
+    {% endif %}
+
+    </ul>
+    <button id="hide_nav">Done</button>
+    </div>

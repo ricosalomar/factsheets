@@ -1,0 +1,19 @@
+{% extends "plants/base.html" %}
+
+{% block title %}{{  plant.scientific_name }}{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumb_container"><a href="/plants/plant-list">Plants</a></div>
+
+{% if plant_list %}
+    <ul>
+    {% for plant in plant_list %}
+        <li><a href="{{ plant.get_absolute_url }}">{{ plant.scientific_name }}</a> | {{ plant.common_names }}<li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No plants are available.</p>
+{% endif %}
+
+{% endblock %}
