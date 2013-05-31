@@ -66,73 +66,78 @@ class CustomPlantListView(TemplateView):
 
 
     def get_query_cache(self, sql, params):
-        # cache results of the raw query
+        """
+        cache results of the raw query
+        return a list of dict items (rows)
+        """
         key = sha1(self.sql).hexdigest()
         if cache.get(key):
-            row = cache.get(key)
+            rows = cache.get(key)
         else:
-            self.cursor.execute(self.sql)
-            row = self.cursor.fetchall()
-            cache.set(key, row, 300)
-        return row
+            rows = sqltodict(self.sql,self.params)
+            cache.set(key, rows, 300)
+        return rows
 
 
     def get_context_data(self, **kwargs):
 
-        NAV_LIST = {'category': 4, 'light': 7, 'flower_color': 5, 'leaf_color': 6, 'season': 8, 'attracts': 9}
+        NAV_DICT = {
+            'category': 'search_categories',
+            'light': 'light',
+            'flower_color': 'flower_colors',
+            'leaf_color': 'leaf_colors',
+            'season': 'seasons',
+            'attracts': 'attracts'
+        }
 
-        plant_list = []
         plant_nav = {}
         nav_count = {}
 
-        self.row = self.get_query_cache(self.sql, self.params)
+        sql_result_dict_list = self.get_query_cache(self.sql, self.params)
 
-        row=self.row
+        # sql_result_dict_list = sqltodict(self.sql,self.params)
 
         #
-        # This is the section that loops over all the left nav categories (NAV_LIST), and returns a copy of the sql result
+        # This is the section that loops over all the left nav categories (NAV_DICT), and returns a copy of the sql result
         # that has been cleaned of those items that DO NOT contain the NAV attributes chosen.
         #
-        for key, idx in NAV_LIST.iteritems():
+        for key, idx in NAV_DICT.iteritems():
             plant_nav[key] = []
             nav_count[key] = {}
-            row = self.remove_from_list(key, row, self.query, idx)
+            sql_result_dict_list = self.remove_from_list(key, sql_result_dict_list, self.query, idx)
 
         #
-        # The row (sql result) now has only items chosen from left nav. We can now rebuild the left nav, and count how
-        # many items each heading has.
+        # The sql_result_dict_list now has only items chosen from left nav. We can now rebuild the left nav, and increment
+        # the nav_count for each key[facet]
         #
-        for r in row:
-            for key, idx in NAV_LIST.iteritems():
-                if r[idx]:
-                    nav_csv = r[idx].split(', ')
-                    for n in nav_csv:
-                        nav_count[key][n] = nav_count[key].get(n,0)+1
-                        if n not in plant_nav[key]:
-                            plant_nav[key].append(n)
+        # Nav looks like this:
+        #
+        # Key
+        #   facet(8)
+        #   facet(2)
+        # Key
+        #   facet(n)
+        #   ...
 
-            plant={}
-            plant['scientific_name'] = r[0]
-            plant['slug'] = r[1]
-            plant['common_names'] = r[2]
-            plant['category_links'] = r[3]
-            plant['img'] = r[10]
-            plant_list.append(plant)
+        for plant in sql_result_dict_list:
+            for key, idx in NAV_DICT.iteritems():
+                if plant[idx]:
+                    nav_facets = [x.strip() for x in plant[idx].split(',')]
+                    for facet in nav_facets:
+                        nav_count[key][facet] = nav_count[key].get(facet,0)+1
+                        if facet not in plant_nav[key]:
+                            plant_nav[key].append(facet)
 
 
-        # sort the nav elements
+        # sort the nav facets
         for n in plant_nav.keys():
             plant_nav[n] = sorted(plant_nav[n])
 
-        for key in NAV_LIST:
+        for key in NAV_DICT:
             # Build the actual HTML to display the list
             plant_nav[key] = self.make_nav_list(self.request, key, self.query, plant_nav[key], nav_count, self.cat)
 
-        plant_count = plant_list.__len__()
-        if plant_count > 500:
-            limit = 50
-        else:
-            limit = 25
+        plant_count = sql_result_dict_list.__len__()
 
         data = {}
         data['plant_count'] = plant_count
@@ -147,37 +152,42 @@ class CustomPlantListView(TemplateView):
         data['link_address'] ='/plants/category/'+self.cat+'/'
         data['cat_count'] = nav_count
 
-        paginator = Paginator(plant_list, limit)
+        if plant_count > 500:
+            limit = 50
+        else:
+            limit = 25
+
+        paginator = Paginator(sql_result_dict_list, limit)
         try:
-            plant_list = paginator.page(kwargs.get('page',1))
+            sql_result_dict_list = paginator.page(kwargs.get('page',1))
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
-            plant_list = paginator.page(1)
+            sql_result_dict_list = paginator.page(1)
         except EmptyPage:
             # If page is out of range , go to first page
-            plant_list = paginator.page(1)
+            sql_result_dict_list = paginator.page(1)
 
-        data['plant_list'] = plant_list
+        data['plant_list'] = sql_result_dict_list
 
         return data
 
 
-    def remove_from_list(self, nav_heading, row, query, idx):
+    def remove_from_list(self, nav_heading, dict_list, query, idx):
         """
         This actually returns a copy of the query list, minus those items that don't match the navigation options chosen
         """
         a_row = []
         if nav_heading in query:
-            for r in row:
+            for r in dict_list:
                 if r[idx]:
-                    nav_list = r[idx].split(', ')
+                    nav_list = [x.strip() for x in r[idx].split(',')]
                     query_items = query[nav_heading].split(',')
                     q_set = set(query_items)
                     n_set = set(nav_list)
                     if q_set.issubset(n_set):
                         a_row.append(r)
         else:
-            a_row = row
+            a_row = dict_list
 
         return a_row
 
@@ -255,74 +265,70 @@ class CustomCatView(CustomPlantListView):
 
     def get_context_data(self, **kwargs):
 
-        full_query_dict = self.query
-
+        # full_query_dict = self.query
         if self.sort == 'common_name':
-            self.sql = """ SELECT p.scientific_name, p.slug, CONCAT('<a href="/plants/all/',p.slug,'">',n.common_name,'</a>'),
-                    GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/category/',c2.slug,'">',c2.category,'</a>') SEPARATOR ', ') as categories,
-                    GROUP_CONCAT( DISTINCT c2.category SEPARATOR ', ') as search_categories,
-                    GROUP_CONCAT( DISTINCT clr.color SEPARATOR ', ') as flower_colors,
-                    GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors,
-                    GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light,
-                    GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
-                    GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
-                    (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
-                    FROM plants_commonname n
-                    LEFT JOIN plants_plant p ON p.id = n.plant_id
-                    LEFT JOIN plants_plant_category pc ON pc.plant_id = p.id
-                    LEFT JOIN plants_category c ON c.id = pc.category_id
-                    LEFT JOIN plants_plant_category pc2 ON pc2.plant_id = p.id
-                    LEFT JOIN plants_category c2 ON pc2.category_id = c2.id
-                    LEFT JOIN plants_plant_search_flower_color fc ON fc.plant_id = p.id
-                    LEFT JOIN plants_color clr ON clr.id = fc.color_id
-                    LEFT JOIN plants_plant_search_leaf_color lc ON lc.plant_id = p.id
-                    LEFT JOIN plants_color clr2 ON clr2.id = lc.color_id
-                    LEFT JOIN plants_plant_search_light sl ON sl.plant_id = p.id
-                    LEFT JOIN plants_light l ON l.id = sl.light_id
-                    LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
-                    LEFT JOIN plants_season s ON s.id = ss.season_id
-                    LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
-                    LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
-                    WHERE c.slug = '%s'
-                    GROUP BY n.common_name ORDER BY n.common_name """ % (self.cat)
+            self.sql = """ SELECT p.scientific_name, p.slug, CONCAT('<a href="/plants/all/',p.slug,'">',n.common_name,'</a>') as common_names,
+            GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/category/',c2.slug,'">',c2.category,'</a>') SEPARATOR ', ') as categories,
+            GROUP_CONCAT( DISTINCT c2.category SEPARATOR ', ') as search_categories,
+            GROUP_CONCAT( DISTINCT clr.color SEPARATOR ', ') as flower_colors,
+            GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors,
+            GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light,
+            GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
+            GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
+            (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
+            FROM plants_commonname n
+            LEFT JOIN plants_plant p ON p.id = n.plant_id
+            LEFT JOIN plants_plant_category pc ON pc.plant_id = p.id
+            LEFT JOIN plants_category c ON c.id = pc.category_id
+            LEFT JOIN plants_plant_category pc2 ON pc2.plant_id = p.id
+            LEFT JOIN plants_category c2 ON pc2.category_id = c2.id
+            LEFT JOIN plants_plant_search_flower_color fc ON fc.plant_id = p.id
+            LEFT JOIN plants_color clr ON clr.id = fc.color_id
+            LEFT JOIN plants_plant_search_leaf_color lc ON lc.plant_id = p.id
+            LEFT JOIN plants_color clr2 ON clr2.id = lc.color_id
+            LEFT JOIN plants_plant_search_light sl ON sl.plant_id = p.id
+            LEFT JOIN plants_light l ON l.id = sl.light_id
+            LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
+            LEFT JOIN plants_season s ON s.id = ss.season_id
+            LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
+            LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
+            WHERE c.slug = '%s'
+            GROUP BY n.common_name ORDER BY n.common_name """ % (self.cat)
         else:
             self.sql = """ SELECT p.scientific_name, p.slug, GROUP_CONCAT( DISTINCT n.common_name SEPARATOR ', ') as common_names,
-                    GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/category/',c2.slug,'">',c2.category,'</a>') SEPARATOR ', ') as categories,
-                    GROUP_CONCAT( DISTINCT c2.category SEPARATOR ', ') as search_categories,
-                    GROUP_CONCAT( DISTINCT clr.color SEPARATOR ', ') as flower_colors,
-                    GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors,
-                    GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light,
-                    GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
-                    GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
-                    (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
-                    FROM plants_plant_category pc
-                    LEFT JOIN plants_category c ON c.id = pc.category_id
-                    LEFT JOIN plants_plant p ON p.id = pc.plant_id
-                    LEFT JOIN plants_plant_category pc2 ON pc2.plant_id = p.id
-                    LEFT JOIN plants_category c2 ON pc2.category_id = c2.id
-                    LEFT JOIN plants_commonname n ON p.id = n.plant_id
-                    LEFT JOIN plants_plant_search_flower_color fc ON fc.plant_id = p.id
-                    LEFT JOIN plants_color clr ON clr.id = fc.color_id
-                    LEFT JOIN plants_plant_search_leaf_color lc ON lc.plant_id = p.id
-                    LEFT JOIN plants_color clr2 ON clr2.id = lc.color_id
-                    LEFT JOIN plants_plant_search_light sl ON sl.plant_id = p.id
-                    LEFT JOIN plants_light l ON l.id = sl.light_id
-                    LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
-                    LEFT JOIN plants_season s ON s.id = ss.season_id
-                    LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
-                    LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
-                    WHERE c.slug = '%s'
-                    GROUP BY p.id ORDER BY p.scientific_name """ % (self.cat)
+            GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/category/',c2.slug,'">',c2.category,'</a>') SEPARATOR ', ') as categories,
+            GROUP_CONCAT( DISTINCT c2.category SEPARATOR ', ') as search_categories,
+            GROUP_CONCAT( DISTINCT clr.color SEPARATOR ', ') as flower_colors,
+            GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors,
+            GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light,
+            GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
+            GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
+            (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
+            FROM plants_plant_category pc
+            LEFT JOIN plants_category c ON c.id = pc.category_id
+            LEFT JOIN plants_plant p ON p.id = pc.plant_id
+            LEFT JOIN plants_plant_category pc2 ON pc2.plant_id = p.id
+            LEFT JOIN plants_category c2 ON pc2.category_id = c2.id
+            LEFT JOIN plants_commonname n ON p.id = n.plant_id
+            LEFT JOIN plants_plant_search_flower_color fc ON fc.plant_id = p.id
+            LEFT JOIN plants_color clr ON clr.id = fc.color_id
+            LEFT JOIN plants_plant_search_leaf_color lc ON lc.plant_id = p.id
+            LEFT JOIN plants_color clr2 ON clr2.id = lc.color_id
+            LEFT JOIN plants_plant_search_light sl ON sl.plant_id = p.id
+            LEFT JOIN plants_light l ON l.id = sl.light_id
+            LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
+            LEFT JOIN plants_season s ON s.id = ss.season_id
+            LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
+            LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
+            WHERE c.slug = '%s'
+            GROUP BY p.id ORDER BY p.scientific_name """ % (self.cat)
 
-            self.params = ()
+        self.params = ()
 
-
-
-            data = super(CustomCatView, self).get_context_data(**kwargs)
-            data['category'] = Category.objects.get(slug=self.cat)
+        data = super(CustomCatView, self).get_context_data(**kwargs)
+        data['category'] = Category.objects.get(slug=self.cat)
 
         return data
-
 
 
 class CustomSearchView(CustomPlantListView):
@@ -337,13 +343,12 @@ class CustomSearchView(CustomPlantListView):
         # Cache the results of the raw query
         key = sha1(sql + (',').join(params)).hexdigest()
         if cache.get(key):
-            row = cache.get(key)
+            rows = cache.get(key)
         else:
-            self.cursor.execute(sql+self.sort_stmt, (params))
-            row = self.cursor.fetchall()
-            cache.set(key, row, 300)
+            rows = sqltodict(self.sql,self.params)
+            cache.set(key, rows, 300)
 
-        return row
+        return rows
 
 
     def get_context_data(self, **kwargs):
@@ -359,89 +364,106 @@ class CustomSearchView(CustomPlantListView):
             if sort == 'common_name':
                 self.sort_stmt = 'ORDER BY n.common_name '+sort_direction+';'
                 sql.append(""" SELECT p.scientific_name
-                    , p.slug
-                    , CONCAT('<a href="/plants/all/',p.slug,'">',n.common_name,'</a>')
-                    , GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/category/',c2.slug,'">',c2.category,'</a>') SEPARATOR ', ') as categories
-                    , GROUP_CONCAT( DISTINCT c2.category SEPARATOR ', ') as search_categories
-                    , GROUP_CONCAT( DISTINCT clr.color SEPARATOR ', ') as flower_colors
-                    , GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors
-                    , GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light
-                    , GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
-                    GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
-                    (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
-                    FROM plants_commonname n
-                    LEFT JOIN plants_plant p ON p.id = n.plant_id
-                    LEFT JOIN plants_plant_category pc ON pc.plant_id = p.id
-                    LEFT JOIN plants_category c ON c.id = pc.category_id
-                    LEFT JOIN plants_plant_category pc2 ON pc2.plant_id = p.id
-                    LEFT JOIN plants_category c2 ON pc2.category_id = c2.id
-                    LEFT JOIN plants_plant_search_flower_color fc ON fc.plant_id = p.id
-                    LEFT JOIN plants_color clr ON clr.id = fc.color_id
-                    LEFT JOIN plants_plant_search_leaf_color lc ON lc.plant_id = p.id
-                    LEFT JOIN plants_color clr2 ON clr2.id = lc.color_id
-                    LEFT JOIN plants_plant_search_light sl ON sl.plant_id = p.id
-                    LEFT JOIN plants_light l ON l.id = sl.light_id
-                    LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
-                    LEFT JOIN plants_season s ON s.id = ss.season_id
-                    LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
-                    LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
-                    LEFT OUTER JOIN plants_cultivar cv ON (p.`id` = cv.`plant_id`)
-                    LEFT OUTER JOIN taggit_taggeditem ti ON (p.`id` = ti.`object_id`)
-                    LEFT OUTER JOIN taggit_tag t ON (ti.`tag_id` = t.`id`)
-                    LEFT OUTER JOIN `django_content_type` ON (ti.`content_type_id` = `django_content_type`.`id`)
-                    WHERE (p.`scientific_name` REGEXP %s = 1 OR p.`comment` REGEXP %s = 1 OR n.`common_name` REGEXP %s = 1 OR cv.`cultivar` REGEXP %s = 1 OR (t.`name` REGEXP %s = 1 AND `django_content_type`.`id` = 12 ) OR p.`color` REGEXP %s = 1 OR p.`flower_color` REGEXP %s = 1 OR p.`flower` REGEXP %s = 1 OR p.`foliage` REGEXP %s = 1 OR p.`season` REGEXP %s = 1 OR c.`category` REGEXP %s = 1  )
-                    GROUP BY scientific_name, n.common_name """)
+                , p.slug
+                , CONCAT('<a href="/plants/all/',p.slug,'">',n.common_name,'</a>')  as common_names
+                , GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/category/',c2.slug,'">',c2.category,'</a>') SEPARATOR ', ') as categories
+                , GROUP_CONCAT( DISTINCT c2.category SEPARATOR ', ') as search_categories
+                , GROUP_CONCAT( DISTINCT clr.color SEPARATOR ', ') as flower_colors
+                , GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors
+                , GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light
+                , GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
+                GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
+                (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
+                FROM plants_commonname n
+                LEFT JOIN plants_plant p ON p.id = n.plant_id
+                LEFT JOIN plants_plant_category pc ON pc.plant_id = p.id
+                LEFT JOIN plants_category c ON c.id = pc.category_id
+                LEFT JOIN plants_plant_category pc2 ON pc2.plant_id = p.id
+                LEFT JOIN plants_category c2 ON pc2.category_id = c2.id
+                LEFT JOIN plants_plant_search_flower_color fc ON fc.plant_id = p.id
+                LEFT JOIN plants_color clr ON clr.id = fc.color_id
+                LEFT JOIN plants_plant_search_leaf_color lc ON lc.plant_id = p.id
+                LEFT JOIN plants_color clr2 ON clr2.id = lc.color_id
+                LEFT JOIN plants_plant_search_light sl ON sl.plant_id = p.id
+                LEFT JOIN plants_light l ON l.id = sl.light_id
+                LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
+                LEFT JOIN plants_season s ON s.id = ss.season_id
+                LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
+                LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
+                LEFT OUTER JOIN plants_cultivar cv ON (p.`id` = cv.`plant_id`)
+                LEFT OUTER JOIN taggit_taggeditem ti ON (p.`id` = ti.`object_id`)
+                LEFT OUTER JOIN taggit_tag t ON (ti.`tag_id` = t.`id`)
+                LEFT OUTER JOIN `django_content_type` ON (ti.`content_type_id` = `django_content_type`.`id`)
+                WHERE (p.`scientific_name` REGEXP %s = 1 OR p.`comment` REGEXP %s = 1 OR n.`common_name` REGEXP %s = 1 OR cv.`cultivar` REGEXP %s = 1 OR (t.`name` REGEXP %s = 1 AND `django_content_type`.`id` = 12 ) OR p.`color` REGEXP %s = 1 OR p.`flower_color` REGEXP %s = 1 OR p.`flower` REGEXP %s = 1 OR p.`foliage` REGEXP %s = 1 OR p.`season` REGEXP %s = 1 OR c.`category` REGEXP %s = 1  )
+                GROUP BY scientific_name, n.common_name """)
             else:
                 self.sort_stmt = 'ORDER BY scientific_name '+sort_direction+';'
                 sql.append(""" SELECT
-                    p.scientific_name
-                    , p.slug
-                    , GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/all/',p.slug,'">',n.common_name,'</a>') SEPARATOR ', ') as common_names
-                    , GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/category/',c2.slug,'">',c2.category,'</a>') SEPARATOR ', ') as categories
-                    , GROUP_CONCAT( DISTINCT c2.category SEPARATOR ', ') as search_categories
-                    , GROUP_CONCAT( DISTINCT clr.color SEPARATOR ', ') as flower_colors
-                    , GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors
-                    , GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light
-                    , GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
-                    GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
-                    (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
-                    FROM plants_plant_category pc
-                    LEFT JOIN plants_category c ON c.id = pc.category_id
-                    LEFT JOIN plants_plant p ON p.id = pc.plant_id
-                    LEFT JOIN plants_plant_category pc2 ON pc2.plant_id = p.id
-                    LEFT JOIN plants_category c2 ON pc2.category_id = c2.id
-                    LEFT JOIN plants_commonname n ON p.id = n.plant_id
-                    LEFT JOIN plants_plant_search_flower_color fc ON fc.plant_id = p.id
-                    LEFT JOIN plants_color clr ON clr.id = fc.color_id
-                    LEFT JOIN plants_plant_search_leaf_color lc ON lc.plant_id = p.id
-                    LEFT JOIN plants_color clr2 ON clr2.id = lc.color_id
-                    LEFT JOIN plants_plant_search_light sl ON sl.plant_id = p.id
-                    LEFT JOIN plants_light l ON l.id = sl.light_id
-                    LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
-                    LEFT JOIN plants_season s ON s.id = ss.season_id
-                    LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
-                    LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
-                    LEFT OUTER JOIN plants_cultivar cv ON (p.`id` = cv.`plant_id`)
-                    LEFT OUTER JOIN taggit_taggeditem ti ON (p.`id` = ti.`object_id`)
-                    LEFT OUTER JOIN taggit_tag t ON (ti.`tag_id` = t.`id`)
-                    LEFT OUTER JOIN `django_content_type` ON (ti.`content_type_id` = `django_content_type`.`id`)
-                    WHERE (p.`scientific_name` REGEXP %s = 1 OR p.`comment` REGEXP %s = 1 OR n.`common_name` REGEXP %s = 1 OR cv.`cultivar` REGEXP %s = 1 OR (t.`name` REGEXP %s = 1 AND `django_content_type`.`id` = 12 ) OR p.`color` REGEXP %s = 1 OR p.`flower_color` REGEXP %s = 1 OR p.`flower` REGEXP %s = 1 OR p.`foliage` REGEXP %s = 1 OR p.`season` REGEXP %s = 1 OR c.`category` REGEXP %s = 1  )
-                    GROUP BY scientific_name """)
+                p.scientific_name
+                , p.slug
+                , GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/all/',p.slug,'">',n.common_name,'</a>') SEPARATOR ', ') as common_names
+                , GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/category/',c2.slug,'">',c2.category,'</a>') SEPARATOR ', ') as categories
+                , GROUP_CONCAT( DISTINCT c2.category SEPARATOR ', ') as search_categories
+                , GROUP_CONCAT( DISTINCT clr.color SEPARATOR ', ') as flower_colors
+                , GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors
+                , GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light
+                , GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
+                GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
+                (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
+                FROM plants_plant_category pc
+                LEFT JOIN plants_category c ON c.id = pc.category_id
+                LEFT JOIN plants_plant p ON p.id = pc.plant_id
+                LEFT JOIN plants_plant_category pc2 ON pc2.plant_id = p.id
+                LEFT JOIN plants_category c2 ON pc2.category_id = c2.id
+                LEFT JOIN plants_commonname n ON p.id = n.plant_id
+                LEFT JOIN plants_plant_search_flower_color fc ON fc.plant_id = p.id
+                LEFT JOIN plants_color clr ON clr.id = fc.color_id
+                LEFT JOIN plants_plant_search_leaf_color lc ON lc.plant_id = p.id
+                LEFT JOIN plants_color clr2 ON clr2.id = lc.color_id
+                LEFT JOIN plants_plant_search_light sl ON sl.plant_id = p.id
+                LEFT JOIN plants_light l ON l.id = sl.light_id
+                LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
+                LEFT JOIN plants_season s ON s.id = ss.season_id
+                LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
+                LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
+                LEFT OUTER JOIN plants_cultivar cv ON (p.`id` = cv.`plant_id`)
+                LEFT OUTER JOIN taggit_taggeditem ti ON (p.`id` = ti.`object_id`)
+                LEFT OUTER JOIN taggit_tag t ON (ti.`tag_id` = t.`id`)
+                LEFT OUTER JOIN `django_content_type` ON (ti.`content_type_id` = `django_content_type`.`id`)
+                WHERE (p.`scientific_name` REGEXP %s = 1 OR p.`comment` REGEXP %s = 1 OR n.`common_name` REGEXP %s = 1 OR cv.`cultivar` REGEXP %s = 1 OR (t.`name` REGEXP %s = 1 AND `django_content_type`.`id` = 12 ) OR p.`color` REGEXP %s = 1 OR p.`flower_color` REGEXP %s = 1 OR p.`flower` REGEXP %s = 1 OR p.`foliage` REGEXP %s = 1 OR p.`season` REGEXP %s = 1 OR c.`category` REGEXP %s = 1  )
+                GROUP BY scientific_name """)
 
-            for x in range(0,11):
-                params = params+('[[:<:]]' + q + '[[:>:]]',)
+        for x in range(0,11):
+            params = params+('[[:<:]]' + q + '[[:>:]]',)
 
-            self.params = params
-            self.sql = (" UNION").join(sql)
+        self.params = params
+        self.sql = (" UNION").join(sql)
 
 
-            data = super(CustomSearchView, self).get_context_data(**kwargs)
-            data['category'] = None
-            data['category_slug'] = 'all'
-            data['link_address'] = '/plants/search/'
-            data['search'] = True
-            data['search_query'] = (',').join(self.search_query)
+        data = super(CustomSearchView, self).get_context_data(**kwargs)
+        data['category'] = None
+        data['category_slug'] = 'all'
+        data['link_address'] = '/plants/search/'
+        data['search'] = True
+        data['search_query'] = (',').join(self.search_query)
 
         return data
+
+
+def sqltodict(query,param):
+    """
+    http://djangosnippets.org/snippets/1383/
+    """
+    from django.db import connection
+    cursor = connection.cursor()
+    cursor.execute(query,param)
+    fieldnames = [name[0] for name in cursor.description]
+    result = []
+    for row in cursor.fetchall():
+        rowset = []
+        for field in zip(fieldnames, row):
+            rowset.append(field)
+        result.append(dict(rowset))
+    return result
 
 
