@@ -42,9 +42,9 @@ class PlantCatListView(ListView):
 
 class CustomPlantListView(TemplateView):
     """
-    This is the abstract parent class of the category view and search view. Since the two views have different SQL queries, those
-    are in the respective child classes.
-    If the view is a Category view, there will be a kwarg['cat']
+    This is the abstract parent class of the category view and search view. Since the two views have different SQL queries,
+    those are in the respective child classes.
+    If the view is a Category view, there will be a kwarg['cat'].
     get_query_cache is the method that attempts to retrieve the sql result from the cache, or store a new one.
     The get_context_data method is pretty complex, because it builds the layered navigation on the left side.
     """
@@ -93,11 +93,9 @@ class CustomPlantListView(TemplateView):
 
         sql_result_dict_list = self.get_query_cache(self.sql, self.params)
 
-        # sql_result_dict_list = sqltodict(self.sql,self.params)
-
         #
-        # This is the section that loops over all the left nav categories (NAV_DICT), and returns a copy of the sql result
-        # that has been cleaned of those items that DO NOT contain the NAV attributes chosen.
+        # This is the section that loops over all the left nav categories (NAV_DICT), and returns a copy of the sql
+        # result that has been cleaned of those items that DO NOT contain the NAV facets chosen.
         #
         for key, idx in NAV_DICT.iteritems():
             plant_nav[key] = []
@@ -172,7 +170,8 @@ class CustomPlantListView(TemplateView):
 
     def remove_from_list(self, nav_heading, dict_list, query, idx):
         """
-        This actually returns a copy of the query list, minus those items that don't match the navigation options chosen
+        This actually returns a copy of the sql_result_dict_list, minus those items that
+        don't match the navigation options chosen.
         """
         a_row = []
         if nav_heading in query:
@@ -193,31 +192,31 @@ class CustomPlantListView(TemplateView):
     def make_nav_list(self, request, nav_heading, query, nav_heading_values, nav_count, cat):
         """
         Builds the href and query string for the left navigation elements
-        nav_heading is the left nav category I'm checking against
-        nav_heading_values is the list of values currently on display for the above category (nav_heading)
+        nav_heading is the left nav category I'm checking against.
+        nav_heading_values is the list of facets currently on display for the above category (nav_heading).
         E.g., if nav_heading is "category", then nav_heading_values[] might be [u'Annuals', u'Herbs', etc...]
 
         What I want to do here is:
-        If the query contains this definition ( e.g., color=), I want to do one of 2 things:
-            1. If the selection and query item are the same, then remove the query. This is like a toggle.
-            2. If the selection and query are different, then add a comma to the query (we'll add the new query item later)
-
+        If the url query contains this definition ( e.g., category=), I want to do one of 2 things:
+            1. If the selection and url query item are the same, then remove the query item. This is like a toggle.
+            2. If the selection and url query are different, then add a comma to the query
+                (we'll add the new query item later)
         """
         import urllib
         new_list = []
 
         if nav_heading in query:
             new_query = query.copy()
-            # old_query_item will hold just what it says
-            # It's the item from the previous query string
             old_query_item = new_query[nav_heading]+','
             del new_query[nav_heading]
         else:
             old_query_item = ''
             new_query = query.copy()
+
         for key, val in new_query.iteritems():
             new_list.append('%s=%s' % (key, val))
         new_query = '&'.join(new_list)
+
         if new_query:
             new_query = '?'+new_query+'&'
         else:
@@ -227,7 +226,7 @@ class CustomPlantListView(TemplateView):
         path = URLObject(request.get_full_path()).path
 
         # Now we have the old query built and patched up.
-        # We are going to loop through the values for this nav_heading and create the html for each one
+        # We are going to loop through the values for this nav_heading and create the html for each one.
 
         for el in nav_heading_values:
             if nav_heading in query:
@@ -268,6 +267,9 @@ class CustomPlantListView(TemplateView):
 
 
 class CustomCatView(CustomPlantListView):
+    """
+    This class produces a list of all plants in a given category, e.g., 'annuals'
+    """
 
     def get_context_data(self, **kwargs):
 
@@ -338,6 +340,9 @@ class CustomCatView(CustomPlantListView):
 
 
 class CustomSearchView(CustomPlantListView):
+    """
+    This class produces a list of plants filtered on url parameter q.
+    """
 
     def dispatch(self, request, *args,**kwargs):
         self.cat = 'all'
