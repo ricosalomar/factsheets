@@ -43,10 +43,8 @@ class PlantAdmin(admin.ModelAdmin):
                 'search_leaf_color',
                 'search_light',
                 'search_season',
+                'attracts',
                 'drought_tolerant',
-                'attracts_songbirds',
-                'attracts_hummingbirds',
-                'attracts_butterflies',
                 'update_time',
                 'tags',
                 'season',
@@ -102,7 +100,7 @@ class PlantAdmin(admin.ModelAdmin):
     list_filter = ['category','updated','update_time']
 
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
-        if db_field.name == 'search_flower_color' or db_field.name == 'search_leaf_color' or db_field.name == 'category' or db_field.name == 'search_light' or db_field.name == 'search_season':
+        if db_field.name == 'search_flower_color' or db_field.name == 'search_leaf_color' or db_field.name == 'category' or db_field.name == 'search_light' or db_field.name == 'search_season' or db_field.name == 'attracts':
             kwargs['widget'] = CheckboxSelectMultiple()
             kwargs['help_text'] = ''
 

@@ -79,7 +79,7 @@ class CustomPlantListView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        NAV_LIST = {'category': 4, 'light': 7, 'flower_color': 5, 'leaf_color': 6, 'season': 8}
+        NAV_LIST = {'category': 4, 'light': 7, 'flower_color': 5, 'leaf_color': 6, 'season': 8, 'attracts': 9}
 
         plant_list = []
         plant_nav = {}
@@ -116,7 +116,7 @@ class CustomPlantListView(TemplateView):
             plant['slug'] = r[1]
             plant['common_names'] = r[2]
             plant['category_links'] = r[3]
-            plant['img'] = r[9]
+            plant['img'] = r[10]
             plant_list.append(plant)
 
 
@@ -265,6 +265,7 @@ class CustomCatView(CustomPlantListView):
                     GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors,
                     GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light,
                     GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
+                    GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
                     (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
                     FROM plants_commonname n
                     LEFT JOIN plants_plant p ON p.id = n.plant_id
@@ -280,6 +281,8 @@ class CustomCatView(CustomPlantListView):
                     LEFT JOIN plants_light l ON l.id = sl.light_id
                     LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
                     LEFT JOIN plants_season s ON s.id = ss.season_id
+                    LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
+                    LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
                     WHERE c.slug = '%s'
                     GROUP BY n.common_name ORDER BY n.common_name """ % (self.cat)
         else:
@@ -290,6 +293,7 @@ class CustomCatView(CustomPlantListView):
                     GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors,
                     GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light,
                     GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
+                    GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
                     (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
                     FROM plants_plant_category pc
                     LEFT JOIN plants_category c ON c.id = pc.category_id
@@ -305,6 +309,8 @@ class CustomCatView(CustomPlantListView):
                     LEFT JOIN plants_light l ON l.id = sl.light_id
                     LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
                     LEFT JOIN plants_season s ON s.id = ss.season_id
+                    LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
+                    LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
                     WHERE c.slug = '%s'
                     GROUP BY p.id ORDER BY p.scientific_name """ % (self.cat)
 
@@ -361,6 +367,7 @@ class CustomSearchView(CustomPlantListView):
                     , GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors
                     , GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light
                     , GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
+                    GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
                     (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
                     FROM plants_commonname n
                     LEFT JOIN plants_plant p ON p.id = n.plant_id
@@ -376,6 +383,8 @@ class CustomSearchView(CustomPlantListView):
                     LEFT JOIN plants_light l ON l.id = sl.light_id
                     LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
                     LEFT JOIN plants_season s ON s.id = ss.season_id
+                    LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
+                    LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
                     LEFT OUTER JOIN plants_cultivar cv ON (p.`id` = cv.`plant_id`)
                     LEFT OUTER JOIN taggit_taggeditem ti ON (p.`id` = ti.`object_id`)
                     LEFT OUTER JOIN taggit_tag t ON (ti.`tag_id` = t.`id`)
@@ -394,6 +403,7 @@ class CustomSearchView(CustomPlantListView):
                     , GROUP_CONCAT( DISTINCT clr2.color SEPARATOR ', ') as leaf_colors
                     , GROUP_CONCAT( DISTINCT l.light SEPARATOR ', ') as light
                     , GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
+                    GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
                     (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
                     FROM plants_plant_category pc
                     LEFT JOIN plants_category c ON c.id = pc.category_id
@@ -409,6 +419,8 @@ class CustomSearchView(CustomPlantListView):
                     LEFT JOIN plants_light l ON l.id = sl.light_id
                     LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
                     LEFT JOIN plants_season s ON s.id = ss.season_id
+                    LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
+                    LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
                     LEFT OUTER JOIN plants_cultivar cv ON (p.`id` = cv.`plant_id`)
                     LEFT OUTER JOIN taggit_taggeditem ti ON (p.`id` = ti.`object_id`)
                     LEFT OUTER JOIN taggit_tag t ON (ti.`tag_id` = t.`id`)

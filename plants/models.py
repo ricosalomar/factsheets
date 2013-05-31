@@ -44,6 +44,12 @@ class Season(models.Model):
     def __unicode__(self):
         return self.season
 
+class Attracts(models.Model):
+    attracts=models.CharField(max_length=64)
+
+    def __unicode__(self):
+        return self.attracts
+
 
 class Plant(models.Model):
 
@@ -57,17 +63,13 @@ class Plant(models.Model):
 
     updated = models.BooleanField(default=False)
     drought_tolerant = models.BooleanField(default=False)
-    attracts_songbirds = models.BooleanField(default=False)
-    attracts_hummingbirds = models.BooleanField(default=False)
-    attracts_butterflies = models.BooleanField(default=False)
 
     search_flower_color = models.ManyToManyField(Color, related_name='plant_flower_color', blank=True)
     search_leaf_color = models.ManyToManyField(Color, related_name='plant_leaf_color', blank=True)
     search_light = models.ManyToManyField(Light, blank=True)
     search_season = models.ManyToManyField(Season, blank=True)
+    attracts = models.ManyToManyField(Attracts, blank=True)
     category = models.ManyToManyField(Category)
-
-    #  annual
 
     height = models.CharField(max_length=128, blank=True)
     width = models.CharField(max_length=128, blank=True)
@@ -212,6 +214,7 @@ class Plant(models.Model):
                 ('Leaf', self.leaf),
                 ('Climbing Method', self.climbing_method),
                 ('Life Cycle', self.life_cycle),
+                # ('Attracts Songbirds', self.attracts_songbirds),
                 ('Tags', ', '.join([t.name for t in self.tags.all()])), ]
 
         if self.category.all().__len__() == 1:
