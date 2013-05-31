@@ -1,10 +1,8 @@
-from django.views.generic import View, DetailView, ListView, TemplateView
-from django.utils.datastructures import SortedDict
-from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response
+from django.views.generic import DetailView, ListView, TemplateView
+from django.shortcuts import render_to_response
 from plants.models import Plant, Category
 from urlobject import URLObject
-from django.core.cache import cache, get_cache
+from django.core.cache import cache
 from hashlib import sha1
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import connection
@@ -229,26 +227,34 @@ class CustomPlantListView(TemplateView):
         path = URLObject(request.get_full_path()).path
 
         # Now we have the old query built and patched up.
-        # We are going to loop through the values for this nav_heading and create the html a hrefs for each one
+        # We are going to loop through the values for this nav_heading and create the html for each one
 
         for el in nav_heading_values:
             if nav_heading in query:
                 query_list = query[nav_heading].split(',')
                 if el in query_list:
                     #
-                    # This element is in the query string (already selected)
-                    # Don't make it clickable
+                    # Are you SURE Python doesn't need a switch?
                     #
                     query_list.remove(el)
                     new_q = (',').join(query_list)
                     if new_q:
-                        ret.append('<label><input class="nav_checkbox checked" type="checkbox" checked onchange="window.location.href=\''+path+new_query+'%s=%s\'">%s (%d)</label>' % (nav_heading,new_q,el.title(), nav_count[nav_heading].get(el,0)))
+                        ret.append('<label><input class="nav_checkbox checked" type="checkbox" checked '
+                                   'onchange="window.location.href=\''+path+new_query+'%s=%s\'">%s (%d)</label>'
+                                   % (nav_heading,new_q,el.title(), nav_count[nav_heading].get(el,0))
+                        )
                     else:
-                        ret.append('<label><input class="nav_checkbox checked" type="checkbox" checked onchange="window.location.href=\''+path+new_query[:-1]+'\'">%s (%d)</label>' % (el.title(),nav_count[nav_heading].get(el,0)))
+                        ret.append('<label><input class="nav_checkbox checked" type="checkbox" checked '
+                                   'onchange="window.location.href=\''+path+new_query[:-1]+'\'">%s (%d)</label>'
+                                   % (el.title(),nav_count[nav_heading].get(el,0)))
                 else:
-                    ret.append('<label><input class="nav_checkbox" type="checkbox" onchange="window.location.href=\''+path+new_query+'%s=%s\'">%s (%d)</label>' % (nav_heading,old_query_item+el,el.title(), nav_count[nav_heading].get(el,0)))
+                    ret.append('<label><input class="nav_checkbox" type="checkbox" '
+                               'onchange="window.location.href=\''+path+new_query+'%s=%s\'">%s (%d)</label>'
+                               % (nav_heading,old_query_item+el,el.title(), nav_count[nav_heading].get(el,0)))
             else:
-                ret.append('<label><input class="nav_checkbox"  type="checkbox" onchange="window.location.href=\'%s%s%s=%s\'">%s (%d)</label>' % (path, str(new_query), nav_heading, el, el.title(), nav_count[nav_heading].get(el, 0)))
+                ret.append('<label><input class="nav_checkbox"  type="checkbox" '
+                           'onchange="window.location.href=\'%s%s%s=%s\'">%s (%d)</label>'
+                           % (path, str(new_query), nav_heading, el, el.title(), nav_count[nav_heading].get(el, 0)))
 
         return ret
 
@@ -394,7 +400,14 @@ class CustomSearchView(CustomPlantListView):
                 LEFT OUTER JOIN taggit_taggeditem ti ON (p.`id` = ti.`object_id`)
                 LEFT OUTER JOIN taggit_tag t ON (ti.`tag_id` = t.`id`)
                 LEFT OUTER JOIN `django_content_type` ON (ti.`content_type_id` = `django_content_type`.`id`)
-                WHERE (p.`scientific_name` REGEXP %s = 1 OR p.`comment` REGEXP %s = 1 OR n.`common_name` REGEXP %s = 1 OR cv.`cultivar` REGEXP %s = 1 OR (t.`name` REGEXP %s = 1 AND `django_content_type`.`id` = 12 ) OR p.`color` REGEXP %s = 1 OR p.`flower_color` REGEXP %s = 1 OR p.`flower` REGEXP %s = 1 OR p.`foliage` REGEXP %s = 1 OR p.`season` REGEXP %s = 1 OR c.`category` REGEXP %s = 1  )
+                WHERE (p.`scientific_name` REGEXP %s = 1 OR p.`comment` REGEXP %s = 1 OR n.`common_name` REGEXP %s = 1
+                OR cv.`cultivar` REGEXP %s = 1
+                OR (t.`name` REGEXP %s = 1 AND `django_content_type`.`id` = 12 ) OR p.`color` REGEXP %s = 1
+                OR p.`flower_color` REGEXP %s = 1
+                OR p.`flower` REGEXP %s = 1
+                OR p.`foliage` REGEXP %s = 1
+                OR p.`season` REGEXP %s = 1
+                OR c.`category` REGEXP %s = 1  )
                 GROUP BY scientific_name, n.common_name """)
             else:
                 self.sort_stmt = 'ORDER BY scientific_name '+sort_direction+';'
@@ -430,7 +443,17 @@ class CustomSearchView(CustomPlantListView):
                 LEFT OUTER JOIN taggit_taggeditem ti ON (p.`id` = ti.`object_id`)
                 LEFT OUTER JOIN taggit_tag t ON (ti.`tag_id` = t.`id`)
                 LEFT OUTER JOIN `django_content_type` ON (ti.`content_type_id` = `django_content_type`.`id`)
-                WHERE (p.`scientific_name` REGEXP %s = 1 OR p.`comment` REGEXP %s = 1 OR n.`common_name` REGEXP %s = 1 OR cv.`cultivar` REGEXP %s = 1 OR (t.`name` REGEXP %s = 1 AND `django_content_type`.`id` = 12 ) OR p.`color` REGEXP %s = 1 OR p.`flower_color` REGEXP %s = 1 OR p.`flower` REGEXP %s = 1 OR p.`foliage` REGEXP %s = 1 OR p.`season` REGEXP %s = 1 OR c.`category` REGEXP %s = 1  )
+                WHERE (p.`scientific_name` REGEXP %s = 1
+                OR p.`comment` REGEXP %s = 1
+                OR n.`common_name` REGEXP %s = 1
+                OR cv.`cultivar` REGEXP %s = 1
+                OR (t.`name` REGEXP %s = 1 AND `django_content_type`.`id` = 12 )
+                OR p.`color` REGEXP %s = 1
+                OR p.`flower_color` REGEXP %s = 1
+                OR p.`flower` REGEXP %s = 1
+                OR p.`foliage` REGEXP %s = 1
+                OR p.`season` REGEXP %s = 1
+                OR c.`category` REGEXP %s = 1  )
                 GROUP BY scientific_name """)
 
         for x in range(0,11):
