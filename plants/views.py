@@ -463,8 +463,8 @@ class CustomSearchView(CustomPlantListView):
                 OR c.`category` REGEXP %s = 1  )
                 GROUP BY scientific_name """)
 
-        for x in range(0,11):
-            params = params+('[[:<:]]' + q + '[[:>:]]',)
+            for x in range(0,11):
+                params = params+('[[:<:]]' + q + '[[:>:]]',)
 
         self.params = params
         self.sql = (" UNION").join(sql)
