@@ -131,7 +131,7 @@ class CustomPlantListView(TemplateView):
 
         for key in NAV_DICT:
             # Build the actual HTML to display the list
-            plant_nav[key] = self.make_nav_list(self.request, key, self.query, plant_nav[key], nav_count, self.cat)
+            plant_nav[key] = self.make_nav_list(self.request, key, self.query, plant_nav[key], nav_count)
 
         plant_count = sql_result_dict_list.__len__()
 
@@ -172,26 +172,28 @@ class CustomPlantListView(TemplateView):
         """
         This actually returns a copy of the sql_result_dict_list, minus those items that
         don't match the navigation options chosen.
+        Returns a list of dicts (plants).
         """
-        a_row = []
+        ret = []
         if nav_heading in query:
-            for r in dict_list:
-                if r[idx]:
-                    nav_list = [x.strip() for x in r[idx].split(',')]
+            for plant in dict_list:
+                if plant[idx]:
+                    nav_list = [x.strip() for x in plant[idx].split(',')]
                     query_items = query[nav_heading].split(',')
                     q_set = set(query_items)
                     n_set = set(nav_list)
                     if q_set.issubset(n_set):
-                        a_row.append(r)
+                        ret.append(plant)
         else:
-            a_row = dict_list
+            ret = dict_list
 
-        return a_row
+        return ret
 
 
-    def make_nav_list(self, request, nav_heading, query, nav_heading_values, nav_count, cat):
+    def make_nav_list(self, request, nav_heading, query, nav_heading_values, nav_count):
         """
-        Builds the href and query string for the left navigation elements
+        Builds the href and query string for the left navigation elements.
+        Returns a list of html elements (checkboxes) for the left nav.
         nav_heading is the left nav category I'm checking against.
         nav_heading_values is the list of facets currently on display for the above category (nav_heading).
         E.g., if nav_heading is "category", then nav_heading_values[] might be [u'Annuals', u'Herbs', etc...]

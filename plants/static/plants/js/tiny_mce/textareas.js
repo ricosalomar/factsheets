@@ -33,6 +33,6 @@ style_formats : [
     {title : 'Table row 1', selector : 'tr', classes : 'tablerow'}
 ],
 
-width: '1096',
+width: '1080',
 height: '150'
 });

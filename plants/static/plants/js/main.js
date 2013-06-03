@@ -51,6 +51,9 @@ $(document).ready(function(){
         });
     });
 
+    /* Clean up css for tiny_mce */
+    $('#left_col dl dd p').last().css('margin-bottom', '0');
+
     function GetURLParameter(sParam){
         var sPageURL = window.location.search.substring(1);
         var sURLVariables = sPageURL.split('&');

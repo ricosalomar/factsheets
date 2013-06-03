@@ -40,6 +40,8 @@
 .plant_detail dl dt {font-weight: bold;}
 .plant_detail dl dd {margin: 0 0 0 5px;}
 
+.plant_id { color: #FEFEFC; }
+
 #left_col { float: left; width: 55%; margin-bottom: 10px;}
 
 #right_col { float: right; width: 44%; margin: 0 0 0 1%; }

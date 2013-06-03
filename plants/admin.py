@@ -59,7 +59,6 @@ class PlantAdmin(admin.ModelAdmin):
                 'usage',
                 'organ',
                 'hardiness',
-                'storage',
                 'foliage',
                 'flower',
                 'zones',
@@ -81,10 +80,7 @@ class PlantAdmin(admin.ModelAdmin):
                 'distribution',
                 'found',
                 'mode',
-                'poison_part',
-                'symptoms',
                 'edibility',
-                'toxic_principle',
                 'severity',
                 'sub_type',
                 'fragrance',
@@ -92,6 +88,10 @@ class PlantAdmin(admin.ModelAdmin):
                 'leaf',
                 'climbing_method',
                 'life_cycle',
+                'storage',
+                'poison_part',
+                'symptoms',
+                'toxic_principle',
                 'internal_comment', ]
     ordering = ('scientific_name',)
     readonly_fields = ['update_time', 'update_by', OldUrlInline]

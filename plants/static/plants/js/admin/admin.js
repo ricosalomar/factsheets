@@ -9,6 +9,7 @@
         $('.clone').remove();
         $(".field-comment").before('<div style="clear:both;">&nbsp;</div>');
 //        $(".field-category").after('<div class="form-row" id="chosen_category">Categories chosen:<br /><span id="chosen_cat_span"></span><div>');
+        $(".vLargeTextField").css({'width':'1070px'});
 
         $('a').each(function(){
 		    if($(this).text() == 'Add another Plant-Category Relationship') {
