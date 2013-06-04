@@ -11,7 +11,7 @@
 .field-category ul li { list-style-type: none;padding: 1px 0 0 3px;display: inline-block;margin: 1px;white-space: nowrap;width: 130px;border: 1px solid #cecece; }
 .field-search_light, .field-search_season {width: 98%; }
 
-.form-row { float:left; }
+.form-row { float:left; min-height:33px; }
 .field-drought_tolerant, .field-update_time, .field-tags { width:98%; float: none; }
 tr.form-row { width:100%; float:none;}
 

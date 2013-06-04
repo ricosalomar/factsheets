@@ -180,9 +180,10 @@ class CustomPlantListView(TemplateView):
                 if plant[idx]:
                     nav_list = [x.strip() for x in plant[idx].split(',')]
                     query_items = query[nav_heading].split(',')
+                    negatives = set([s[1:] for s in query_items if "!" in s])
                     q_set = set(query_items)
                     n_set = set(nav_list)
-                    if q_set.issubset(n_set):
+                    if q_set.issubset(n_set) and not negatives.issubset(n_set):
                         ret.append(plant)
         else:
             ret = dict_list
