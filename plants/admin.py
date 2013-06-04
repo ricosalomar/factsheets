@@ -96,7 +96,7 @@ class PlantAdmin(admin.ModelAdmin):
     ordering = ('scientific_name',)
     readonly_fields = ['update_time', 'update_by', OldUrlInline]
     inlines = [ CommonNameInline, CultivarInline, PlantImageInline, OldUrlInline,]
-    list_display = ('scientific_name','common_names', 'categories','update_time')
+    list_display = ('scientific_name','common_names', 'categories','update_time', 'internal_comment')
     list_filter = ['category','updated','update_time']
 
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
