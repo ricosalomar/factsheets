@@ -1,7 +1,7 @@
 {% extends "plants/base.html" %}
 {% load plant_extras %}
 
-{% block title %}{{  plant.scientific_name }}{% endblock %}
+{% block title %}{{ category|default_if_none:"Search Results" }}{% endblock %}
 
 {% block content %}
     <div class="breadcrumb_container">

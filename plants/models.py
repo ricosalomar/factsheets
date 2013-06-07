@@ -119,9 +119,9 @@ class Plant(models.Model):
     mode = models.CharField(max_length=256, blank=True)
     poison_part = models.TextField(blank=True)
     symptoms = models.TextField(blank=True)
-    edibility = models.CharField(max_length=256, blank=True)
+    edibility = models.TextField(blank=True)
     toxic_principle = models.TextField(blank=True)
-    severity = models.CharField(max_length=256, blank=True)
+    severity = models.TextField(blank=True)
 
 
     # objects = InheritanceManager()

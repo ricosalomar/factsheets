@@ -7,7 +7,6 @@ from hashlib import sha1
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import connection
 
-
 class PlantDetailView(DetailView):
     """
     The plant detail view: returns a plant and a category (for navigation)
@@ -301,9 +300,12 @@ class CustomCatView(CustomPlantListView):
             LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
             LEFT JOIN plants_season s ON s.id = ss.season_id
             LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
-            LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
-            WHERE c.slug = '%s'
-            GROUP BY n.common_name ORDER BY n.common_name """ % (self.cat)
+            LEFT JOIN plants_attracts a ON pa.attracts_id = a.id """
+
+            if self.cat != 'all':
+                self.sql += """WHERE c.slug = '%s' """ % (self.cat)
+
+            self.sql += """GROUP BY n.common_name ORDER BY n.common_name """
         else:
             self.sql = """ SELECT p.scientific_name, p.slug, GROUP_CONCAT( DISTINCT n.common_name SEPARATOR ', ') as common_names,
             GROUP_CONCAT( DISTINCT CONCAT('<a href="/plants/category/',c2.slug,'">',c2.category,'</a>') SEPARATOR ', ') as categories,
@@ -329,14 +331,20 @@ class CustomCatView(CustomPlantListView):
             LEFT JOIN plants_plant_search_season ss ON ss.plant_id = p.id
             LEFT JOIN plants_season s ON s.id = ss.season_id
             LEFT JOIN plants_plant_attracts pa ON pa.plant_id = p.id
-            LEFT JOIN plants_attracts a ON pa.attracts_id = a.id
-            WHERE c.slug = '%s'
-            GROUP BY p.id ORDER BY p.scientific_name """ % (self.cat)
+            LEFT JOIN plants_attracts a ON pa.attracts_id = a.id """
+
+            if self.cat != 'all':
+                self.sql += """WHERE c.slug = '%s' """ % (self.cat)
+
+            self.sql += """GROUP BY p.id ORDER BY p.scientific_name """
 
         self.params = ()
 
         data = super(CustomCatView, self).get_context_data(**kwargs)
-        data['category'] = Category.objects.get(slug=self.cat)
+        if self.cat != 'all':
+            data['category'] = Category.objects.get(slug=self.cat)
+        else:
+            data['category'] = 'All Plants'
 
         return data
 
