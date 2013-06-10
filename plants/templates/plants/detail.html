@@ -12,7 +12,9 @@
 
 <div class="plant_details">
 <h1>{{  plant.scientific_name }}</h1>
-<div class="poison-warning">This plant has poison characteristics. See below.</div>
+{% if poison %}
+     <div class="poison-warning">This plant has poison characteristics. See below.</div>
+{% endif %}
     <dl>
     {% for name, value in plant.get_fields %}
       {% if value %}

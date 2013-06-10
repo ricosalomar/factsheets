@@ -15,13 +15,15 @@ class PlantDetailView(DetailView):
     template_name='plants/detail.html'
     model = Plant
 
-
     def get_context_data(self, **kwargs):
+        self.object = self.get_object()
         context = super(PlantDetailView, self).get_context_data(**kwargs)
         if self.kwargs['cat'] and self.kwargs['cat'] != 'all':
             category = Category.objects.get(slug=self.kwargs['cat'])
         else:
             category = ''
+        if 'Poisonous Plants' in [c.category for c in self.object.category.all()]:
+            context['poison'] = True
         context['category']= category
         context['plant_url'] = self.request.get_host()+context['plant'].get_absolute_url()
         return context
