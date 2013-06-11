@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     url(r'^search/(?P<page>[\d]*)/$', CustomSearchView.as_view()),
     url(r'^search/$', CustomSearchView.as_view()),
     url(r'(?P<cat>[-\w]*)/(?P<slug>[-\w]+)/$', PlantDetailView.as_view()),
+    url(r'^category/$', PlantCatListView.as_view()),
     (r'^$', PlantCatListView.as_view())
 )
 
