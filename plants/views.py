@@ -400,6 +400,33 @@ class CustomSearchView(CustomPlantListView):
             rows = cache.get(key)
         else:
             rows = sqltodict(self.sql,self.params)
+
+            for s in rows:
+                m = re.search('[0-9]+ (in.|ft.)', s.get('height', None))
+                if m:
+                    v = m.group(0).split(' ')
+                    if v[1] == 'in.':
+                        h = 12 / float(v[0])
+                    else:
+                        h = int(v[0])
+
+                    if h <= 1:
+                        height = '1 ft. or less'
+                    elif h <= 3:
+                        height = '1-3 ft.'
+                    elif h <= 6:
+                        height = '3-6 ft.'
+                    elif h <= 9:
+                        height = '6-9 ft.'
+                    elif h <= 20:
+                        height = '9-20 ft.'
+                    elif h > 20:
+                        height = 'greater than 20 ft.'
+
+                    s.update({'search_height': height})
+                else:
+                    s.update({'search_height': None})
+
             cache.set(key, rows, 300)
 
         return rows
