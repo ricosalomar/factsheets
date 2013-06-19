@@ -20,7 +20,11 @@
 
         {% for q, i in query_dict.items %}
             {% if q != 's'  and q != 'q'%}
-                > {{ q|deslug }} = {{ i|deslug }}
+                {% if q != 'height' %}
+                    > {{ q|deslug }} = {{ i|deslug }}
+                {% else %}
+                    > {{ q|deslug }} = {{ i }}
+                {% endif %}
             {% endif %}
         {% endfor %}
 
