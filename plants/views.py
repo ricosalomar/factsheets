@@ -77,30 +77,7 @@ class CustomPlantListView(TemplateView):
             rows = sqltodict(self.sql,self.params)
 
             for s in rows:
-                m = re.search('[0-9]+ (in.|ft.)', s.get('height', None))
-                if m:
-                    v = m.group(0).split(' ')
-                    if v[1] == 'in.':
-                        h = 12 / float(v[0])
-                    else:
-                        h = int(v[0])
-
-                    if h <= 1:
-                        height = '1 ft. or less'
-                    elif h <= 3:
-                        height = '1-3 ft.'
-                    elif h <= 6:
-                        height = '3-6 ft.'
-                    elif h <= 9:
-                        height = '6-9 ft.'
-                    elif h <= 20:
-                        height = '9-20 ft.'
-                    elif h > 20:
-                        height = 'greater than 20 ft.'
-
-                    s.update({'search_height': height})
-                else:
-                    s.update({'search_height': None})
+                s.update({'search_height': parse_height(s)})
 
             cache.set(key, rows, 300)
 
@@ -403,30 +380,7 @@ class CustomSearchView(CustomPlantListView):
             rows = sqltodict(self.sql,self.params)
 
             for s in rows:
-                m = re.search('[0-9]+ (in.|ft.)', s.get('height', None))
-                if m:
-                    v = m.group(0).split(' ')
-                    if v[1] == 'in.':
-                        h = 12 / float(v[0])
-                    else:
-                        h = int(v[0])
-
-                    if h <= 1:
-                        height = '1 ft. or less'
-                    elif h <= 3:
-                        height = '1-3 ft.'
-                    elif h <= 6:
-                        height = '3-6 ft.'
-                    elif h <= 9:
-                        height = '6-9 ft.'
-                    elif h <= 20:
-                        height = '9-20 ft.'
-                    elif h > 20:
-                        height = 'greater than 20 ft.'
-
-                    s.update({'search_height': height})
-                else:
-                    s.update({'search_height': None})
+               s.update({'search_height': parse_height(s)})
 
             cache.set(key, rows, 300)
 
@@ -566,5 +520,43 @@ def sqltodict(query,param):
             rowset.append(field)
         result.append(dict(rowset))
     return result
+
+
+def parse_height(result_dict):
+    """
+    Takes a row from the queryset (as a dict, thank you very much).
+    Returns a string representing the range that the height falls within.
+    Converts inches to feet, too.
+    E.g., '18 in.' returns '1-3 ft.'; '2-5 ft.' returns '3-6 ft.'
+    Since there are so many values for height ( and width, depth, etc) defined in the data, this breaks them up into
+    manageable sizes that can be used to sort the data on the front end.
+    """
+    m = re.search('[0-9]+ (in.|ft.)', result_dict.get('height', None))
+    # '7-11 in.' -> '11 in.' captured
+    height = None
+    if m:
+        v = m.group(0).split(' ')
+        if v[1] == 'in.':
+            # convert in. to ft.
+            h = 12 / float(v[0])
+        else:
+            h = int(v[0])
+
+        if h <= 1:
+            height = '1 ft. or less'
+        elif h <= 3:
+            height = '1-3 ft.'
+        elif h <= 6:
+            height = '3-6 ft.'
+        elif h <= 9:
+            height = '6-9 ft.'
+        elif h <= 20:
+            height = '9-20 ft.'
+        elif h > 20:
+            height = 'greater than 20 ft.'
+        else:
+            height = None
+
+    return height
 
 
