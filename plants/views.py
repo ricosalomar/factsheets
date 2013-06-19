@@ -317,6 +317,7 @@ class CustomCatView(CustomPlantListView):
             GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
             GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
             (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
+            , p.height
             FROM plants_commonname n
             LEFT JOIN plants_plant p ON p.id = n.plant_id
             LEFT JOIN plants_plant_category pc ON pc.plant_id = p.id
@@ -455,6 +456,7 @@ class CustomSearchView(CustomPlantListView):
                 , GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
                 GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
                 (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
+                , p.height
                 FROM plants_commonname n
                 LEFT JOIN plants_plant p ON p.id = n.plant_id
                 LEFT JOIN plants_plant_category pc ON pc.plant_id = p.id
