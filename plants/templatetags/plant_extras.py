@@ -4,8 +4,13 @@ register = template.Library()
 
 @register.filter(is_safe=True)
 def deslug(value):
-    ret = value.replace('-',' ').replace('_',' ')
+    ret = value.replace('-', ' ').replace('_', ' ')
     return ret.title()
+
+@register.filter(is_safe=True)
+def fix_ft_in(value):
+    # ret = value.replace('Ft.','ft.').replace('In.','in.')
+    return value.lower()
 
 @register.filter
 def qr(value,size="25x25"):

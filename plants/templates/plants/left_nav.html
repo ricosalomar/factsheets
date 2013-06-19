@@ -1,3 +1,4 @@
+{% load plant_extras %}
     <div class="three columns" id ="left_nav">
     <h3>Navigate</h3>
     <span class="nav_toggle hide">hide</span>
@@ -25,7 +26,7 @@
         <li>Height</li>
             <ul>
         {% for s in plant_nav.height %}
-            <li>{{ s|safe|lower }}</li>
+            <li>{{ s|safe|fix_ft_in }}</li>
         {% endfor %}
             </ul>
     {% endif %}
