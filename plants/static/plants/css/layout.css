@@ -144,7 +144,7 @@ td.row-gray { background: rgb(247, 247, 247) }
 #left_nav ul ul li { font-size: 12px; font-weight: normal;}
 #left_nav ul ul li a { background: url(images/un_checked.png) no-repeat scroll 0 2px; padding-left:12px; text-decoration: none; display: block; }
 #left_nav ul ul li a.selected { background: url(images/checked.png) no-repeat scroll 0 2px; padding-left:12px;}
-#left_nav label { font-weight: normal; }
+#left_nav label { font-weight: normal; cursor: pointer;}
 
 
 ul.cat_list {margin: 0 auto; width: 50%; float:left; min-width: 215px; }
