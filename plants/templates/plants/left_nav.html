@@ -21,6 +21,15 @@
             </ul>
     {% endif %}
 
+    {% if plant_nav.height %}
+        <li>Height</li>
+            <ul>
+        {% for s in plant_nav.height %}
+            <li>{{ s|safe|lower }}</li>
+        {% endfor %}
+            </ul>
+    {% endif %}
+
     {% if plant_nav.light %}
         <li>Light</li>
             <ul>

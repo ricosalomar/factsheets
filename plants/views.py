@@ -6,6 +6,7 @@ from django.core.cache import cache
 from hashlib import sha1
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import connection
+import re
 
 class PlantDetailView(DetailView):
     """
@@ -74,7 +75,35 @@ class CustomPlantListView(TemplateView):
             rows = cache.get(key)
         else:
             rows = sqltodict(self.sql,self.params)
+
+            for s in rows:
+                m = re.search('[0-9]+ (in.|ft.)', s.get('height', None))
+                if m:
+                    v = m.group(0).split(' ')
+                    if v[1] == 'in.':
+                        h = 12 / float(v[0])
+                    else:
+                        h = int(v[0])
+
+                    if h <= 1:
+                        height = '1 ft. or less'
+                    elif h <= 3:
+                        height = '1-3 ft.'
+                    elif h <= 6:
+                        height = '3-6 ft.'
+                    elif h <= 9:
+                        height = '6-9 ft.'
+                    elif h <= 20:
+                        height = '9-20 ft.'
+                    elif h > 20:
+                        height = 'greater than 20 ft.'
+
+                    s.update({'search_height': height})
+                else:
+                    s.update({'search_height': None})
+
             cache.set(key, rows, 300)
+
         return rows
 
 
@@ -86,7 +115,8 @@ class CustomPlantListView(TemplateView):
             'flower_color': 'flower_colors',
             'leaf_color': 'leaf_colors',
             'season': 'seasons',
-            'attracts': 'attracts'
+            'attracts': 'attracts',
+            'height':'search_height'
         }
 
         plant_nav = {}
@@ -318,6 +348,7 @@ class CustomCatView(CustomPlantListView):
             GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
             GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
             (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
+            , p.height
             FROM plants_plant_category pc
             LEFT JOIN plants_category c ON c.id = pc.category_id
             LEFT JOIN plants_plant p ON p.id = pc.plant_id
@@ -440,6 +471,7 @@ class CustomSearchView(CustomPlantListView):
                 , GROUP_CONCAT( DISTINCT s.season SEPARATOR ', ') as seasons,
                 GROUP_CONCAT( DISTINCT a.attracts SEPARATOR ', ') as attracts,
                 (SELECT img_url FROM plants_plantimage images WHERE images.plant_id = p.id LIMIT 1 ) AS img
+                , p.height
                 FROM plants_plant_category pc
                 LEFT JOIN plants_category c ON c.id = pc.category_id
                 LEFT JOIN plants_plant p ON p.id = pc.plant_id

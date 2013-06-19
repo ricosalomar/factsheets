@@ -6,8 +6,7 @@
 #id_category { height: 100px; }
 .vLargeTextField { width: 100%; }
 
-.field-search_flower_color ul li, .field-search_leaf_color ul li, .field-search_light ul li, .field-search_season ul li, .field-attracts ul li { list-style-type: none;padding: 1px 0 0 3px;display: inline-block;margin: 1px;white-space: nowrap;width: 96px;border: 1px solid #cecece; }
-.field-attracts ul li { width: 110px; }
+.field-search_flower_color ul li, .field-search_leaf_color ul li, .field-search_light ul li, .field-search_season ul li, .field-attracts ul li { list-style-type: none;padding: 1px 0 0 3px;display: inline-block;margin: 1px;white-space: nowrap; min_width: 96px;border: 1px solid #cecece; }
 .field-category ul li { list-style-type: none;padding: 1px 0 0 3px;display: inline-block;margin: 1px;white-space: nowrap;width: 130px;border: 1px solid #cecece; }
 .field-search_light, .field-search_season {width: 98%; }
 
