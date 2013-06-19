@@ -39,6 +39,15 @@
             </ul>
     {% endif %}
 
+    {% if plant_nav.attracts %}
+        <li>Attracts</li>
+            <ul>
+        {% for s in plant_nav.attracts %}
+            <li>{{ s|safe }}</li>
+        {% endfor %}
+            </ul>
+    {% endif %}
+
     {% if plant_nav.flower_color %}
         <li>Flower Color</li>
             <ul>
@@ -57,14 +66,7 @@
             </ul>
     {% endif %}
 
-    {% if plant_nav.attracts %}
-        <li>Attracts</li>
-            <ul>
-        {% for s in plant_nav.attracts %}
-            <li>{{ s|safe }}</li>
-        {% endfor %}
-            </ul>
-    {% endif %}
+
 
     </ul>
     <button id="hide_nav">Done</button>
