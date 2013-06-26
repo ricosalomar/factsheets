@@ -36,6 +36,8 @@ class OldUrlInline(admin.TabularInline):
 
 class PlantAdmin(admin.ModelAdmin):
     fields = ['scientific_name',
+                'genus',
+                'species',
                 'category',
                 'comment',
                 'description',

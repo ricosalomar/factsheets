@@ -54,6 +54,8 @@ class Attracts(models.Model):
 class Plant(models.Model):
 
     scientific_name = models.CharField(max_length=128, unique=True)
+    genus = models.CharField(max_length=64)
+    species = models.CharField(max_length=64, blank=True)
     update_time = models.DateTimeField(auto_now=True)
     update_by = models.CharField(max_length=128)
     comment = models.TextField(blank=True)

@@ -9,8 +9,9 @@ def deslug(value):
 
 @register.filter(is_safe=True)
 def fix_ft_in(value):
-    # ret = value.replace('Ft.','ft.').replace('In.','in.')
-    return value.lower()
+    ret = value.replace('Ft.','ft.').replace('In.','in.').replace('Than','than').replace('Or','or').replace('Less','less')
+    return ret
+    # return value.lower()
 
 @register.filter
 def qr(value,size="25x25"):
