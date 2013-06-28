@@ -6,6 +6,8 @@ from django.core.cache import cache
 from hashlib import sha1
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import connection
+from django.utils import simplejson
+from django.http import HttpResponse
 import re
 
 class PlantDetailView(DetailView):
@@ -503,6 +505,18 @@ class CustomSearchView(CustomPlantListView):
         data['search_query'] = (',').join(self.search_query)
 
         return data
+
+def autocompleteModel(request):
+    search_qs = Plant.objects.filter(scientific_name__istartswith=request.REQUEST['term']) | Plant.objects.filter(commonname__common_name__istartswith=request.REQUEST['term'])
+    results = []
+    sci_names = []
+    for r in search_qs:
+        if r.scientific_name not in sci_names:
+            results.append({'value':r.scientific_name +' - '+ r.common_names(), 'url': r.get_absolute_url()})
+            sci_names.append(r.scientific_name)
+    # resp = request.REQUEST['callback'] + '(' + simplejson.dumps(results) + ');'
+    resp = simplejson.dumps(results)
+    return HttpResponse(resp, content_type='application/json')
 
 
 def sqltodict(query,param):

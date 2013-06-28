@@ -188,6 +188,12 @@ ul.cat_list li a:hover { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.14); text-deco
     padding: 10px;
 }
 
+.ui-autocomplete {
+    max-height: 300px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+}
 
 
 

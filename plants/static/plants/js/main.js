@@ -24,6 +24,37 @@ $(document).ready(function(){
         }
     });
 
+
+    var cache = {};
+    $("#search_input").autocomplete({
+        source: function(request, response){
+            var term = request.term;
+            if ( term in cache ) {
+                response( cache[ term ] );
+                return;
+            }
+
+            $.getJSON( "/autocomplete/", request, function( data, status, xhr ) {
+                cache[ term ] = data;
+                response( data );
+            });
+        },
+        minLength: 2,
+        select: function( event, ui ) {
+            console.log( ui.item ?
+                "Selected: " + ui.item.value + " aka " + ui.item.url :
+                "Nothing selected, input was " + this.value );
+            window.location.href = ui.item.url;
+        },
+        'open': function(e, ui) {
+            $('.ui-autocomplete').css('top', $("ul.ui-autocomplete").cssUnit('top')[0] + 4);
+            $('.ui-autocomplete').css('left', $("ul.ui-autocomplete").cssUnit('left')[0] - ($("ul.ui-autocomplete").cssUnit('width')[0]) +124);
+            $('.ui-autocomplete').css('font-size', '80%');
+            $('.ui-autocomplete').css('text-align', 'right');
+        }
+    });
+
+
     $("#search_sort").val(GetURLParameter('s'));
 
     $("#search_sort").change(function(){

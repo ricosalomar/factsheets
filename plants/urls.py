@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^search/$', CustomSearchView.as_view()),
     url(r'(?P<cat>[-\w]*)/(?P<slug>[-\w]+)/$', PlantDetailView.as_view()),
     url(r'^category/$', PlantCatListView.as_view()),
+    url(r'^autocomplete/$', autocompleteModel),
     (r'^$', PlantCatListView.as_view())
 )
 
