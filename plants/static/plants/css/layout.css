@@ -193,7 +193,11 @@ ul.cat_list li a:hover { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.14); text-deco
     overflow-y: auto;
     /* prevent horizontal scrollbar */
     overflow-x: hidden;
+    line-height: 14px;
 }
+
+.ui-autocomplete li b { font-weight: bold; }
+.ui-autocomplete li {border-bottom: 1px solid #cecece; margin: 5px 0; padding-bottom: 5px;}
 
 
 

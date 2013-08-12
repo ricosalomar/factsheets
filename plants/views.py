@@ -507,12 +507,12 @@ class CustomSearchView(CustomPlantListView):
         return data
 
 def autocompleteModel(request):
-    search_qs = Plant.objects.filter(scientific_name__istartswith=request.REQUEST['term']) | Plant.objects.filter(commonname__common_name__istartswith=request.REQUEST['term'])
+    search_qs = Plant.objects.filter(scientific_name__iregex=r'[[:<:]]'+request.REQUEST['term']+'+') | Plant.objects.filter(commonname__common_name__iregex=r'[[:<:]]'+request.REQUEST['term']+'+')
     results = []
     sci_names = []
     for r in search_qs:
         if r.scientific_name not in sci_names:
-            results.append({'value':r.scientific_name +' - '+ r.common_names(), 'url': r.get_absolute_url()})
+            results.append({'sci':r.scientific_name, 'comm':  r.common_names(), 'url': r.get_absolute_url()})
             sci_names.append(r.scientific_name)
     # resp = request.REQUEST['callback'] + '(' + simplejson.dumps(results) + ');'
     resp = simplejson.dumps(results)

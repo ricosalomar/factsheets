@@ -48,11 +48,15 @@ $(document).ready(function(){
         },
         'open': function(e, ui) {
             $('.ui-autocomplete').css('top', $("ul.ui-autocomplete").cssUnit('top')[0] + 4);
-            $('.ui-autocomplete').css('left', $("ul.ui-autocomplete").cssUnit('left')[0] - ($("ul.ui-autocomplete").cssUnit('width')[0]) +124);
+            $('.ui-autocomplete').css('left', $("ul.ui-autocomplete").cssUnit('left')[0] - 170);
             $('.ui-autocomplete').css('font-size', '80%');
-            $('.ui-autocomplete').css('text-align', 'right');
+            $('.ui-autocomplete').css('width', '294px');
         }
-    });
+    }).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+      return $( "<li>" )
+        .append( "<a><b>" + item.sci + "</b><br><span>" + item.comm + "</span></a>" )
+        .appendTo( ul );
+    };
 
 
     $("#search_sort").val(GetURLParameter('s'));
