@@ -281,6 +281,7 @@ class CustomPlantListView(TemplateView):
 class CustomCatView(CustomPlantListView):
     """
     This class produces a list of all plants in a given category, e.g., 'annuals'
+    TODO: rebuild these queries to use Django filters
     """
 
     def get_context_data(self, **kwargs):
